@@ -1,12 +1,32 @@
 # Settings - Type-Safe UserDefaults for Swift
 
-[![Settings Framework](https://img.shields.io/badge/⚙️-Settings-blue?color=4A90E2)](https://github.com/couchdeveloper/Settings)
-[![Swift 6.1](https://img.shields.io/badge/Swift-6.1-orange.svg)](https://swift.org)
-[![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS-brightgreen.svg)](https://swift.org)
-[![iOS 17.0+](https://img.shields.io/badge/iOS-17.0%2B-blue.svg)](https://developer.apple.com/ios/)
-[![macOS 15.0+](https://img.shields.io/badge/macOS-15.0%2B-blue.svg)](https://developer.apple.com/macos/)
-[![Swift Package Manager](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/couchdeveloper/Settings/main/Resources/settings-icon.svg" alt="Settings Icon" width="200"/>
+</p>
+
+<p align="center">
+  <a href="https://github.com/couchdeveloper/Settings">
+    <img src="https://img.shields.io/badge/⚙️-Settings-blue?color=4A90E2" alt="Settings Framework"/>
+  </a>
+  <a href="https://swift.org">
+    <img src="https://img.shields.io/badge/Swift-6.1-orange.svg" alt="Swift 6.1"/>
+  </a>
+  <a href="https://swift.org">
+    <img src="https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS-brightgreen.svg" alt="Platforms"/>
+  </a>
+  <a href="https://developer.apple.com/ios/">
+    <img src="https://img.shields.io/badge/iOS-17.0%2B-blue.svg" alt="iOS 17.0+"/>
+  </a>
+  <a href="https://developer.apple.com/macos/">
+    <img src="https://img.shields.io/badge/macOS-15.0%2B-blue.svg" alt="macOS 15.0+"/>
+  </a>
+  <a href="https://github.com/apple/swift-package-manager">
+    <img src="https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg" alt="SPM"/>
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"/>
+  </a>
+</p>
 
 Type-safe, macro-powered Swift package for `UserDefaults`.
 

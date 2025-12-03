@@ -1,0 +1,52 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gearGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357ABD;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer gear teeth -->
+  <path d="M 256 32 L 278 96 L 234 96 Z M 416 96 L 430 146 L 398 118 Z M 480 256 L 416 278 L 416 234 Z M 416 416 L 366 430 L 394 398 Z M 256 480 L 234 416 L 278 416 Z M 96 416 L 82 366 L 114 394 Z M 32 256 L 96 234 L 96 278 Z M 96 96 L 146 82 L 118 114 Z" 
+        fill="url(#gearGradient)" 
+        stroke="#2C5F8D" 
+        stroke-width="4"/>
+  
+  <!-- Main gear body -->
+  <circle cx="256" cy="256" r="180" 
+          fill="url(#gearGradient)" 
+          stroke="#2C5F8D" 
+          stroke-width="8"/>
+  
+  <!-- Gear teeth (simplified) -->
+  <g fill="url(#gearGradient)" stroke="#2C5F8D" stroke-width="4">
+    <!-- Top -->
+    <rect x="240" y="40" width="32" height="60" rx="4"/>
+    <!-- Top-right -->
+    <rect x="380" y="95" width="60" height="32" rx="4" transform="rotate(45 410 111)"/>
+    <!-- Right -->
+    <rect x="412" y="240" width="60" height="32" rx="4"/>
+    <!-- Bottom-right -->
+    <rect x="380" y="385" width="60" height="32" rx="4" transform="rotate(-45 410 401)"/>
+    <!-- Bottom -->
+    <rect x="240" y="412" width="32" height="60" rx="4"/>
+    <!-- Bottom-left -->
+    <rect x="72" y="385" width="60" height="32" rx="4" transform="rotate(45 102 401)"/>
+    <!-- Left -->
+    <rect x="40" y="240" width="60" height="32" rx="4"/>
+    <!-- Top-left -->
+    <rect x="72" y="95" width="60" height="32" rx="4" transform="rotate(-45 102 111)"/>
+  </g>
+  
+  <!-- Inner circle (hole) -->
+  <circle cx="256" cy="256" r="80" 
+          fill="#FFFFFF" 
+          stroke="#2C5F8D" 
+          stroke-width="6"/>
+  
+  <!-- Center hole -->
+  <circle cx="256" cy="256" r="40" 
+          fill="#E8F4FF" 
+          stroke="#2C5F8D" 
+          stroke-width="4"/>
+</svg>
