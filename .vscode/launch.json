@@ -1,0 +1,44 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:UserDefaults}",
+            "name": "Debug UserDefaultsClient",
+            "preLaunchTask": "swift: Build Debug UserDefaultsClient",
+            "target": "UserDefaultsClient",
+            "configuration": "debug"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:UserDefaults}",
+            "name": "Release UserDefaultsClient",
+            "preLaunchTask": "swift: Build Release UserDefaultsClient",
+            "target": "UserDefaultsClient",
+            "configuration": "release"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Settings}",
+            "name": "Debug SettingsClient",
+            "target": "SettingsClient",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug SettingsClient"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Settings}",
+            "name": "Release SettingsClient",
+            "target": "SettingsClient",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release SettingsClient"
+        }
+    ]
+}

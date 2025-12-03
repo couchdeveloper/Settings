@@ -1,0 +1,207 @@
+# Settings - Type-Safe UserDefaults for Swift
+
+[![Settings Framework](https://img.shields.io/badge/⚙️-Settings-blue?color=4A90E2)](https://github.com/couchdeveloper/Settings)
+[![Swift 6.1](https://img.shields.io/badge/Swift-6.1-orange.svg)](https://swift.org)
+[![Platforms](https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS-brightgreen.svg)](https://swift.org)
+[![iOS 17.0+](https://img.shields.io/badge/iOS-17.0%2B-blue.svg)](https://developer.apple.com/ios/)
+[![macOS 15.0+](https://img.shields.io/badge/macOS-15.0%2B-blue.svg)](https://developer.apple.com/macos/)
+[![Swift Package Manager](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
+Type-safe, macro-powered Swift package for `UserDefaults`.
+
+## Installation
+
+### Swift Package Manager
+
+Add Settings to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/couchdeveloper/Settings.git", from: "0.1.0")
+]
+```
+
+Or in Xcode:
+1. File → Add Package Dependencies
+2. Enter: `https://github.com/couchdeveloper/Settings.git`
+3. Select version: 0.1.0 or later
+
+## Features
+
+- **Type-safe** — Compile-time type checking with generated keys
+- **No boilerplate** — `@Settings` and `@Setting` generate accessors and metadata
+- **UserDefaults-compatible** — Integrates with existing suites without migration
+- **Codable-first** — Encode any `Codable` type via JSON or property list
+- **Native storage** — Stores property list–compatible types directly (String, Int, Bool, Date, Data, URL, Array, Dictionary)
+- **Observable** — Built-in `Combine` publishers and `AsyncSequence` streams
+- **Customizable** — Namespaced keys and pluggable encoders/decoders
+
+## Quick Start
+
+```swift
+import Settings
+
+@Settings(prefix: "app_") // keys prefixed with "app_"
+struct AppSettings {
+    @Setting static var username: String = "Guest"
+    @Setting(name: "colorScheme") static var theme: String = "light" // key = "colorScheme"
+    @Setting static var apiKey: String? // optional: no default
+}
+
+AppSettings.username = "Alice"
+print(AppSettings.theme) // "light"
+```
+
+
+## SwiftUI Integration
+
+```swift
+struct SettingsView: View {
+    @State private var theme = AppSettings.theme
+    
+    var body: some View {
+        Picker("Theme", selection: $theme) {
+            Text("Light").tag("light")
+            Text("Dark").tag("dark")
+        }
+        .onChange(of: theme) { _, newValue in
+            AppSettings.theme = newValue
+        }
+    }
+}
+```
+
+## Projected Value ($propertyName)
+
+Access metadata and observe changes:
+
+```swift
+// Key
+print(AppSettings.$username.key) // "app_username"
+print(AppSettings.$theme.key)    // "colorScheme"
+
+// Reset
+AppSettings.$theme.reset()
+
+// Observe (Combine)
+AppSettings.$theme.publisher.sink { print("Theme:", $0) }
+
+// Observe (AsyncSequence)
+for try await theme in AppSettings.$theme.stream {
+    print("Theme:", theme)
+}
+```
+
+## Codable
+
+```swift
+struct UserProfile: Codable, Equatable {
+    let name: String
+    let age: Int
+}
+
+@Settings(prefix: "app_")
+struct Settings {
+    @Setting(encoding: .json)
+    static var profile: UserProfile = .init(name: "Guest", age: 0)
+}
+
+Settings.profile = .init(name: "Alice", age: 30)
+```
+
+## Optionals
+
+```swift
+@Settings(prefix: "app_")
+struct Settings {
+    @Setting static var apiKey: String?  // no default value!
+}
+
+Settings.apiKey = "secret123"
+Settings.apiKey = nil // removes key from UserDefaults
+```
+
+## Nested Containers
+
+```
+extension AppSettings { enum UserSettings {} }
+
+extension AppSettings.UserSettings {
+    @Setting static var email: String?
+}
+
+print(AppSettings.UserSettings.$email.key) // "app_UserSettings::email"
+AppSettings.UserSettings.email = "alice@example.com"
+```
+
+## Concurrency
+
+Use explicit isolation if accessed across actors.
+
+```swift
+@Settings(prefix: "app_")
+struct Settings {
+    @MainActor @Setting static var theme: String = "light"
+}
+```
+
+## Requirements
+
+- Swift 6.1
+- macOS 10.15+ / iOS 13.0+ / tvOS 13.0+ / watchOS 6.0+
+
+## Installation
+
+### Swift Package Manager
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/couchdeveloper/UserDefaults.git", from: "0.1.0")
+]
+```
+
+## Advanced
+
+```swift
+// Suite (App Group)
+@Settings(prefix: "shared_", suiteName: "group.com.myapp")
+struct SharedSettings {
+    @Setting static var syncEnabled: Bool = true
+}
+
+// Custom key
+@Setting(name: "custom_key")
+static var value: Int = 42
+
+// Custom encoders/decoders
+@Setting(encoder: JSONEncoder(), decoder: JSONDecoder())
+static var customProfile: UserProfile = .init(name: "Custom", age: 0)
+
+// Key-path observation
+struct User: Codable, Equatable { var name: String; var age: Int }
+
+@Settings(prefix: "app_")
+struct Settings {
+    @Setting(encoding: .json)
+    static var user: User = .init(name: "Guest", age: 0)
+}
+
+for try await name in Settings.$user.stream(for: \.name) {
+    print("Name:", name)
+}
+```
+
+## Requirements
+
+- Swift 6.1 or later
+- iOS 17.0+ / macOS 15.0+ / tvOS 17.0+ / watchOS 10.0+
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## License
+
+Apache License (v2.0) - See [LICENSE](LICENSE) file for details
+

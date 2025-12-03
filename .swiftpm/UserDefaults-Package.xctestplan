@@ -1,0 +1,36 @@
+{
+  "configurations" : [
+    {
+      "id" : "5B59847F-2B8B-4005-B4E5-6F0F4D40BABF",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:",
+      "identifier" : "UserDefaultsClient",
+      "name" : "UserDefaultsClient"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "UserDefaultsMacroExpansionTests",
+        "name" : "UserDefaultsMacroExpansionTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "UserDefaultsTests",
+        "name" : "UserDefaultsTests"
+      }
+    }
+  ],
+  "version" : 1
+}
