@@ -1,8 +1,9 @@
-# Settings - Type-Safe UserDefaults for Swift
 
 <p align="center">
   <img src="Resources/settings-icon.png" alt="Settings Icon" width="200"/>
 </p>
+
+# Settings - Type-Safe UserDefaults for Swift
 
 <p align="center">
   <a href="https://github.com/couchdeveloper/Settings">
