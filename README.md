@@ -144,7 +144,7 @@ Settings.apiKey = nil // removes key from UserDefaults
 
 ## Nested Containers
 
-```
+```swift
 extension AppSettings { enum UserSettings {} }
 
 extension AppSettings.UserSettings {
