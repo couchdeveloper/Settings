@@ -39,6 +39,26 @@
             "target": "SettingsClient",
             "configuration": "release",
             "preLaunchTask": "swift: Build Release SettingsClient"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Settings}",
+            "name": "Debug SettingsTestHelper",
+            "target": "SettingsTestHelper",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug SettingsTestHelper"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Settings}",
+            "name": "Release SettingsTestHelper",
+            "target": "SettingsTestHelper",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release SettingsTestHelper"
         }
     ]
 }
