@@ -22,7 +22,7 @@ import Combine
 /// struct SettingsView: View {
 ///     @AppSetting(\.username) var username
 ///     @AppSetting(\.theme) var theme
-///     
+///
 ///     var body: some View {
 ///         Form {
 ///             TextField("Username", text: $username)
@@ -46,7 +46,7 @@ public struct AppSettingValues: __Settings_Container {
 /// UserDefault properties, with automatic view updates when the value changes:
 ///
 /// ```swift
-/// @Settings(prefix: "com.example.app")
+/// @Settings(prefix: "com_example_app_")
 /// struct AppSettings {
 ///     @Setting static var username: String = "guest"
 ///     @Setting static var isDarkMode: Bool = false
@@ -65,15 +65,40 @@ public struct AppSettingValues: __Settings_Container {
 /// }
 /// ```
 ///
+/// Additionally, the Settings library provides `AppSettingValues`, a default container that simplifies
+/// setting up UserDefaults-backed settings. You can declare settings in an extension and use them via
+/// key paths:
+///
+/// ```swift
+/// extension AppSettingValues {
+///     @Setting var username: String = "guest"
+///     @Setting var isDarkMode: Bool = false
+/// }
+///
+/// struct SettingsView: View {
+///     @AppSetting(\.$username) var username
+///     @AppSetting(\.$isDarkMode) var isDarkMode
+///
+///     var body: some View {
+///         Form {
+///             TextField("Username", text: $username)
+///             Toggle("Dark Mode", isOn: $isDarkMode)
+///         }
+///     }
+/// }
+/// ```
+///
+/// See the documentation on `AppSettingValues` for additional details.
+///
 /// The property wrapper observes the specific UserDefaults key and triggers
 /// view updates when the value changes, whether from the current view or elsewhere
 /// in the app.
 @propertyWrapper
-public struct AppSetting<Attribute: __AttributeNonOptional>: DynamicProperty
+public struct AppSetting<Attribute: __Attribute>: DynamicProperty
 where Attribute.Value: Sendable, Attribute.Container.Store: UserDefaults {
 
     @State private var value: Attribute.Value
-    private var cancellable: AnyCancellable?
+    @State private var cancellable: AnyCancellable?
 
     /// The current UserDefaults value.
     public var wrappedValue: Attribute.Value {
@@ -93,19 +118,19 @@ where Attribute.Value: Sendable, Attribute.Container.Store: UserDefaults {
     public init(_ attribute: Attribute.Type) {
         self._value = State(initialValue: Attribute.read())
     }
-    
-    /// Creates a new AppSetting property wrapper from a UserDefault's projected value.
+
+    /// Creates a new AppSetting property wrapper from a UserDefaults projected value.
     ///
     /// This allows cleaner syntax for custom containers:
     /// ```swift
-    /// @AppSetting(AppSettings.$username) var username
+    /// @MyAppSetting(MyAppSettingValues.$username) var username
     /// ```
     public init(_ proxy: __AttributeProxy<Attribute>) {
         self._value = State(initialValue: Attribute.read())
     }
 
-    /// Creates a new AppSetting property wrapper using a keypath to an 
-    /// AppSettingValues property.
+    /// Creates a new AppSetting property wrapper using a key path to an
+    /// `AppSettingValues` property.
     ///
     /// This provides the cleanest syntax for the default container:
     /// ```swift
@@ -114,12 +139,35 @@ where Attribute.Value: Sendable, Attribute.Container.Store: UserDefaults {
     /// }
     ///
     /// struct MyView: View {
-    ///     @AppSetting(\.username) var username
+    ///     @AppSetting(\.$username) var username
     /// }
     /// ```
     ///
-    /// - Parameter keyPath: A keypath to a property on the `AppSettingValues` container.
-    public init(_ keyPath: KeyPath<AppSettingValues, Attribute.Value>) where Attribute.Container == AppSettingValues {
+    /// - Parameter keyPath: A key path to a property on the default `AppSettingValues` container.
+    public init(
+        _ keyPath: KeyPath<AppSettingValues, __AttributeProxy<Attribute>>
+    ) where Attribute.Container == AppSettingValues {
+        self._value = State(initialValue: Attribute.read())
+    }
+
+    /// Creates a new AppSetting property wrapper using a key path to a property
+    /// on a custom settings container.
+    ///
+    /// Use this to reference settings defined on a non-default container:
+    /// ```swift
+    /// extension MyAppSettingValues {
+    ///     @Setting var username: String = "guest"
+    /// }
+    ///
+    /// struct MyView: View {
+    ///     @AppSetting(\AppSettingValues.$username) var username
+    /// }
+    /// ```
+    ///
+    /// - Parameter keyPath: A key path to a property on the custom `Attribute.Container`.
+    public init(
+        _ keyPath: KeyPath<Attribute.Container, __AttributeProxy<Attribute>>
+    ) {
         self._value = State(initialValue: Attribute.read())
     }
 
