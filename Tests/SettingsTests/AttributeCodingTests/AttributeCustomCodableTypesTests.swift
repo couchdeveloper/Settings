@@ -651,7 +651,7 @@ extension AttributeCustomCodableTypesTests {
             Issue.record("Expected decode to fail with corrupted data")
         } catch {
             // Expected to throw - any error is acceptable
-            #expect(true)
+            #expect(Bool(true))
         }
     }
 }
