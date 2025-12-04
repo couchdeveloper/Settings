@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -28,8 +28,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(path: "~/Developer/swift-syntax"),
-        // .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.0"),
+        .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.0"),
         .package(url: "https://github.com/apple/swift-atomics.git", from: "1.2.0"),
     ],
     targets: [

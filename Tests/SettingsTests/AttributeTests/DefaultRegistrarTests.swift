@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import Settings
+import Synchronization
 
 /// Tests that verify DefaultRegistrar only registers defaults once per attribute type
 struct DefaultRegistrarTests {
@@ -9,23 +10,16 @@ struct DefaultRegistrarTests {
     func testDefaultRegistrarCallsRegisterOnlyOnce() async throws {
         // Create a custom container that tracks registration calls
         final class RegistrationTracker: @unchecked Sendable {
-            private let lock = NSLock()
-            private var _registerCallCount = 0
+            private let count = Mutex<Int>(0)
             
             func recordRegistration() {
-                lock.lock()
-                defer { lock.unlock() }
-                _registerCallCount += 1
+                count.withLock { $0 += 1 }
             }
             
             func getCallCount() -> Int {
-                lock.lock()
-                defer { lock.unlock() }
-                return _registerCallCount
+                count.withLock { $0 }
             }
         }
-        
-        let tracker = RegistrationTracker()
         
         struct TrackedContainer: __Settings_Container {
             static let tracker = RegistrationTracker()
@@ -100,7 +94,7 @@ struct DefaultRegistrarTests {
         // must be a stored property. The actual verification happens in the 
         // testDefaultRegistrarCallsRegisterOnlyOnce test above, which proves
         // that multiple reads don't cause multiple registrations.
-        #expect(true, "DefaultRegistrar instances exist per attribute type")
+        #expect(Bool(true), "DefaultRegistrar instances exist per attribute type")
     }
 }
 
@@ -123,3 +117,4 @@ struct TestContainer<Prefix: ConstString>: __Settings_Container {
             .forEach { store.removeObject(forKey: $0) }
     }
 }
+
