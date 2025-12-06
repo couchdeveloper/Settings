@@ -27,8 +27,8 @@ jobs:
         run: |
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           if [ -z "$LATEST_TAG" ]; then
-            echo "No existing tags found, using v0.0.0 as baseline"
-            LATEST_TAG="v0.0.0"
+            echo "No existing tags found, using 0.0.0 as baseline"
+            LATEST_TAG="0.0.0"
           fi
           echo "latest-tag=$LATEST_TAG" >> $GITHUB_OUTPUT
           echo "Latest tag: $LATEST_TAG"
@@ -42,18 +42,44 @@ jobs:
             
             // Get commit of latest tag (or beginning of repo)
             let sinceDate;
-            if (latestTag !== 'v0.0.0') {
-              const tagData = await github.rest.git.getRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: `tags/${latestTag}`
-              });
-              const commitData = await github.rest.git.getCommit({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                commit_sha: tagData.data.object.sha
-              });
-              sinceDate = commitData.data.committer.date;
+            if (latestTag !== '0.0.0') {
+              try {
+                const tagData = await github.rest.git.getRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: `tags/${latestTag}`
+                });
+                
+                // Handle both lightweight and annotated tags
+                let commitSha = tagData.data.object.sha;
+                if (tagData.data.object.type === 'tag') {
+                  // Annotated tag - need to get the tag object first
+                  const tagObject = await github.rest.git.getTag({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    tag_sha: commitSha
+                  });
+                  commitSha = tagObject.data.object.sha;
+                }
+                
+                // Now get the commit
+                const commitData = await github.rest.repos.getCommit({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: commitSha
+                });
+                sinceDate = commitData.data.commit.committer.date;
+              } catch (error) {
+                console.log(`Error getting tag ${latestTag}: ${error.message}`);
+                console.log('Falling back to repository start date');
+                // Fallback to first commit
+                const commits = await github.rest.repos.listCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  per_page: 1
+                });
+                sinceDate = commits.data[0].commit.committer.date;
+              }
             } else {
               // Get first commit date
               const commits = await github.rest.repos.listCommits({
@@ -128,8 +154,8 @@ jobs:
           LATEST_TAG="${{ steps.get-latest-tag.outputs.latest-tag }}"
           BUMP_TYPE="${{ steps.get-prs.outputs.bump-type }}"
           
-          # Remove 'v' prefix and split into components
-          VERSION=${LATEST_TAG#v}
+          # Split into components (no 'v' prefix removal needed)
+          VERSION=$LATEST_TAG
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           
           # Bump version based on change type
@@ -154,9 +180,9 @@ jobs:
           
           if [ "$BUMP_TYPE" != "none" ]; then
             NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-            echo "new-version=v$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
             echo "version-number=$NEW_VERSION" >> $GITHUB_OUTPUT
-            echo "New version: v$NEW_VERSION"
+            echo "New version: $NEW_VERSION"
           fi
           
       - name: Generate changelog entry
