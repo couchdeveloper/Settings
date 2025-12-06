@@ -1,0 +1,314 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Dry run (show what would be released without creating it)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper tag detection
+          
+      - name: Get latest tag
+        id: get-latest-tag
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No existing tags found, using 0.0.0 as baseline"
+            LATEST_TAG="0.0.0"
+          fi
+          echo "latest-tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "Latest tag: $LATEST_TAG"
+          
+      - name: Get merged PRs since last tag
+        id: get-prs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const latestTag = '${{ steps.get-latest-tag.outputs.latest-tag }}';
+            
+            // Get commit of latest tag (or beginning of repo)
+            let sinceDate;
+            if (latestTag !== '0.0.0') {
+              try {
+                const tagData = await github.rest.git.getRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: `tags/${latestTag}`
+                });
+                
+                // Handle both lightweight and annotated tags
+                let commitSha = tagData.data.object.sha;
+                if (tagData.data.object.type === 'tag') {
+                  // Annotated tag - need to get the tag object first
+                  const tagObject = await github.rest.git.getTag({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    tag_sha: commitSha
+                  });
+                  commitSha = tagObject.data.object.sha;
+                }
+                
+                // Now get the commit
+                const commitData = await github.rest.repos.getCommit({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: commitSha
+                });
+                sinceDate = commitData.data.commit.committer.date;
+              } catch (error) {
+                console.log(`Error getting tag ${latestTag}: ${error.message}`);
+                console.log('Falling back to repository start date');
+                // Fallback to first commit
+                const commits = await github.rest.repos.listCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  per_page: 1
+                });
+                sinceDate = commits.data[0].commit.committer.date;
+              }
+            } else {
+              // Get first commit date
+              const commits = await github.rest.repos.listCommits({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 1
+              });
+              sinceDate = commits.data[0].commit.committer.date;
+            }
+            
+            // Get all merged PRs since that date
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 100
+            });
+            
+            const mergedPRs = prs.data.filter(pr => 
+              pr.merged_at && new Date(pr.merged_at) > new Date(sinceDate)
+            );
+            
+            // Categorize PRs by label
+            const breaking = [];
+            const enhancements = [];
+            const bugs = [];
+            const documentation = [];
+            
+            for (const pr of mergedPRs) {
+              const labels = pr.labels.map(l => l.name);
+              if (labels.includes('not-included-in-release')) continue;
+              
+              const entry = `- ${pr.title} (#${pr.number})`;
+              
+              if (labels.includes('breaking')) {
+                breaking.push(entry);
+              } else if (labels.includes('enhancement')) {
+                enhancements.push(entry);
+              } else if (labels.includes('bug')) {
+                bugs.push(entry);
+              } else if (labels.includes('documentation')) {
+                documentation.push(entry);
+              }
+            }
+            
+            // Determine version bump
+            let bumpType = 'none';
+            if (breaking.length > 0) {
+              bumpType = 'major';
+            } else if (enhancements.length > 0) {
+              bumpType = 'minor';
+            } else if (bugs.length > 0) {
+              bumpType = 'patch';
+            }
+            
+            core.setOutput('breaking', JSON.stringify(breaking));
+            core.setOutput('enhancements', JSON.stringify(enhancements));
+            core.setOutput('bugs', JSON.stringify(bugs));
+            core.setOutput('documentation', JSON.stringify(documentation));
+            core.setOutput('bump-type', bumpType);
+            core.setOutput('has-changes', bumpType !== 'none' ? 'true' : 'false');
+            
+            console.log(`Found ${mergedPRs.length} merged PRs since ${latestTag}`);
+            console.log(`Breaking: ${breaking.length}, Enhancements: ${enhancements.length}, Bugs: ${bugs.length}, Docs: ${documentation.length}`);
+            console.log(`Version bump: ${bumpType}`);
+            
+      - name: Calculate new version
+        id: calc-version
+        run: |
+          LATEST_TAG="${{ steps.get-latest-tag.outputs.latest-tag }}"
+          BUMP_TYPE="${{ steps.get-prs.outputs.bump-type }}"
+          
+          # Split into components (no 'v' prefix removal needed)
+          VERSION=$LATEST_TAG
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          
+          # Bump version based on change type
+          case $BUMP_TYPE in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+            none)
+              echo "No version bump needed"
+              NEW_VERSION=""
+              ;;
+          esac
+          
+          if [ "$BUMP_TYPE" != "none" ]; then
+            NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+            echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "version-number=$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "New version: $NEW_VERSION"
+          fi
+          
+      - name: Generate changelog entry
+        id: changelog
+        if: steps.get-prs.outputs.has-changes == 'true'
+        run: |
+          BREAKING='${{ steps.get-prs.outputs.breaking }}'
+          ENHANCEMENTS='${{ steps.get-prs.outputs.enhancements }}'
+          BUGS='${{ steps.get-prs.outputs.bugs }}'
+          DOCS='${{ steps.get-prs.outputs.documentation }}'
+          VERSION="${{ steps.calc-version.outputs.version-number }}"
+          DATE=$(date +%Y-%m-%d)
+          
+          # Create changelog entry
+          CHANGELOG="## [$VERSION] - $DATE"$'\n'
+          
+          # Parse JSON arrays and add sections
+          BREAKING_ITEMS=$(echo "$BREAKING" | jq -r '.[]' 2>/dev/null || echo "")
+          if [ -n "$BREAKING_ITEMS" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### Breaking Changes"$'\n'"$BREAKING_ITEMS"$'\n'
+          fi
+          
+          ENHANCEMENT_ITEMS=$(echo "$ENHANCEMENTS" | jq -r '.[]' 2>/dev/null || echo "")
+          if [ -n "$ENHANCEMENT_ITEMS" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### Added"$'\n'"$ENHANCEMENT_ITEMS"$'\n'
+          fi
+          
+          BUG_ITEMS=$(echo "$BUGS" | jq -r '.[]' 2>/dev/null || echo "")
+          if [ -n "$BUG_ITEMS" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### Fixed"$'\n'"$BUG_ITEMS"$'\n'
+          fi
+          
+          DOC_ITEMS=$(echo "$DOCS" | jq -r '.[]' 2>/dev/null || echo "")
+          if [ -n "$DOC_ITEMS" ]; then
+            CHANGELOG="$CHANGELOG"$'\n'"### Documentation"$'\n'"$DOC_ITEMS"$'\n'
+          fi
+          
+          # Save to file and output
+          echo "$CHANGELOG" > /tmp/new_changelog.md
+          echo "changelog-entry<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "Generated changelog:"
+          cat /tmp/new_changelog.md
+          
+      - name: Update CHANGELOG.md
+        if: steps.get-prs.outputs.has-changes == 'true' && inputs.dry-run == false
+        run: |
+          # Read existing changelog
+          if [ -f CHANGELOG.md ]; then
+            # Insert new entry after the header (after line containing "## [")
+            awk '/^## \[/ && !done {print "'"$(cat /tmp/new_changelog.md)"'"; print ""; done=1} {print}' CHANGELOG.md > /tmp/updated_changelog.md
+            mv /tmp/updated_changelog.md CHANGELOG.md
+          else
+            echo "# Changelog" > CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            echo "All notable changes to this project will be documented in this file." >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            echo "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," >> CHANGELOG.md
+            echo "and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)." >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            cat /tmp/new_changelog.md >> CHANGELOG.md
+          fi
+          
+          echo "Updated CHANGELOG.md:"
+          head -n 30 CHANGELOG.md
+          
+      - name: Commit and tag
+        if: steps.get-prs.outputs.has-changes == 'true' && inputs.dry-run == false
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add CHANGELOG.md
+          git commit -m "Release ${{ steps.calc-version.outputs.new-version }}"
+          git tag -a ${{ steps.calc-version.outputs.new-version }} -m "Release ${{ steps.calc-version.outputs.new-version }}"
+          git push --follow-tags
+          
+      - name: Create GitHub Release
+        if: steps.get-prs.outputs.has-changes == 'true' && inputs.dry-run == false
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const changelogEntry = `${{ steps.changelog.outputs.changelog-entry }}`;
+            
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: '${{ steps.calc-version.outputs.new-version }}',
+              name: '${{ steps.calc-version.outputs.new-version }}',
+              body: changelogEntry,
+              draft: false,
+              prerelease: false
+            });
+            
+      - name: Dry run summary
+        if: inputs.dry-run == true
+        run: |
+          echo "### 🔍 Dry Run - No changes made" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.get-prs.outputs.has-changes }}" == "true" ]; then
+            echo "**New version would be:** ${{ steps.calc-version.outputs.new-version }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Changelog entry:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/new_changelog.md >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No changes to release (only documentation or not-included-in-release PRs)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: Release summary
+        if: steps.get-prs.outputs.has-changes == 'true' && inputs.dry-run == false
+        run: |
+          echo "### ✅ Release Created" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.calc-version.outputs.new-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Type:** ${{ steps.get-prs.outputs.bump-type }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[View Release](https://github.com/${{ github.repository }}/releases/tag/${{ steps.calc-version.outputs.new-version }})" >> $GITHUB_STEP_SUMMARY
+          
+      - name: No changes summary
+        if: steps.get-prs.outputs.has-changes == 'false'
+        run: |
+          echo "### ℹ️ No Release Needed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "No PRs with breaking, enhancement, or bug labels found since last release." >> $GITHUB_STEP_SUMMARY
+          echo "Only documentation or not-included-in-release changes were merged." >> $GITHUB_STEP_SUMMARY

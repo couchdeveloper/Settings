@@ -1,9 +1,7 @@
 import Foundation
-import Synchronization
+import os
 import Settings
 
-
-@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable {
     
     public static let standard: UserDefaultsStoreMock = .init(store: [:])
@@ -26,16 +24,16 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
                 sanitized[k] = copy
             }
         }
-        state = Mutex<State>(.init(store: sanitized))
+        state = OSAllocatedUnfairLock(initialState: State(store: sanitized))
         super.init()
     }
     
     override public init() {
-        state = Mutex<State>(.init())
+        state = OSAllocatedUnfairLock(initialState: State())
         super.init()
     }
     
-    let state: Mutex<State>
+    let state: OSAllocatedUnfairLock<State>
     
     
     public func reset() {
@@ -78,11 +76,9 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
     }
     
     private func readEffectiveValue(forKey key: String) -> Any? {
-        var result: Any?
-        state.withLock { state in
-            result = state.values[key] ?? state.defaults[key]
+        state.withLockUnchecked { state in
+            state.values[key] ?? state.defaults[key]
         }
-        return result
     }
     
     private func number(from any: Any) -> NSNumber? {
@@ -105,12 +101,12 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
                 return
             }
             var oldEffective: Any?
-            state.withLock { state in
+            state.withLockUnchecked { state in
                 oldEffective = state.values[key] ?? state.defaults[key]
             }
             let shouldNotify = !isEqualPlist(oldEffective, stored)
             if shouldNotify { willChangeValue(forKey: key) }
-            state.withLock { state in
+            state.withLockUnchecked { state in
                 state.values[key] = stored
             }
             if shouldNotify { didChangeValue(forKey: key) }
@@ -118,7 +114,7 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
             // Removing a value restores the effective value to the default for the key (if any).
             var oldEffective: Any?
             var newEffective: Any?
-            state.withLock { state in
+            state.withLockUnchecked { state in
                 oldEffective = state.values[key] ?? state.defaults[key]
                 newEffective = state.defaults[key]
             }
@@ -201,7 +197,7 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
             var hasUserValue = false
             var oldEffective: Any?
             var newEffective: Any?
-            state.withLock { state in
+            state.withLockUnchecked { state in
                 hasUserValue = state.values[key] != nil
                 oldEffective = state.values[key] ?? state.defaults[key]
                 newEffective = hasUserValue ? state.values[key] : copy
@@ -209,7 +205,7 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
 
             let shouldNotify = !hasUserValue && !isEqualPlist(oldEffective, newEffective)
             if shouldNotify { willChangeValue(forKey: key) }
-            state.withLock { state in
+            state.withLockUnchecked { state in
                 state.defaults[key] = copy
             }
             if shouldNotify { didChangeValue(forKey: key) }
@@ -222,6 +218,14 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
     
     public override func setValue(_ value: Any?, forKey key: String) {
         set(value, forKey: key)
+    }
+    
+    public func dictionaryRepresentation() -> [String : Any] {
+        state.withLockUnchecked { state in
+            var values = state.values
+            values.merge(state.defaults, uniquingKeysWith: { lhs, rhs in lhs })
+            return values
+        }
     }
 }
 

@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 extension __Attribute
-where Container.Store: UserDefaults, Value: Sendable {
+where Value: Sendable {
 
     public static var publisher: AnyPublisher<Value, Error> {
         let publisher = AsyncStreamPublisher(Self.stream)
