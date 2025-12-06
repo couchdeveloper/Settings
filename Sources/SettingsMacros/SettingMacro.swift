@@ -265,6 +265,7 @@ extension SettingMacro {
     private static func makeContainerTypealias(containerType: String) -> MemberBlockItemSyntax {
         MemberBlockItemSyntax(
             decl: TypeAliasDeclSyntax(
+                modifiers: [DeclModifierSyntax(name: .keyword(.public))],
                 name: "Container",
                 initializer: TypeInitializerClauseSyntax(
                     value: IdentifierTypeSyntax(
@@ -279,6 +280,7 @@ extension SettingMacro {
     private static func makeValueTypealias(valueType: ParsedValueType) -> MemberBlockItemSyntax {
         MemberBlockItemSyntax(
             decl: TypeAliasDeclSyntax(
+                modifiers: [DeclModifierSyntax(name: .keyword(.public))],
                 name: "Value",
                 initializer: TypeInitializerClauseSyntax(
                     value: IdentifierTypeSyntax(
@@ -316,6 +318,7 @@ extension SettingMacro {
         
         return MemberBlockItemSyntax(
             decl: TypeAliasDeclSyntax(
+                modifiers: [DeclModifierSyntax(name: .keyword(.public))],
                 name: "Wrapped",
                 initializer: TypeInitializerClauseSyntax(
                     value: IdentifierTypeSyntax(
@@ -352,7 +355,10 @@ extension SettingMacro {
     private static func makeNameProperty(attributeQualifiedName: String) -> MemberBlockItemSyntax {
         MemberBlockItemSyntax(
             decl: VariableDeclSyntax(
-                modifiers: [DeclModifierSyntax(name: .keyword(.static))],
+                modifiers: [
+                    DeclModifierSyntax(name: .keyword(.public)),
+                    DeclModifierSyntax(name: .keyword(.static))
+                ],
                 bindingSpecifier: .keyword(.let),
                 bindings: PatternBindingListSyntax([
                     PatternBindingSyntax(
@@ -381,7 +387,10 @@ extension SettingMacro {
         }
         return MemberBlockItemSyntax(
             decl: VariableDeclSyntax(
-                modifiers: [DeclModifierSyntax(name: .keyword(.static))],
+                modifiers: [
+                    DeclModifierSyntax(name: .keyword(.public)),
+                    DeclModifierSyntax(name: .keyword(.static))
+                ],
                 bindingSpecifier: .keyword(.let),
                 bindings: PatternBindingListSyntax([
                     PatternBindingSyntax(
@@ -406,7 +415,10 @@ extension SettingMacro {
     private static func makeDefaultRegistrarProperty() -> MemberBlockItemSyntax {
         MemberBlockItemSyntax(
             decl: VariableDeclSyntax(
-                modifiers: [DeclModifierSyntax(name: .keyword(.static))],
+                modifiers: [
+                    DeclModifierSyntax(name: .keyword(.public)),
+                    DeclModifierSyntax(name: .keyword(.static))
+                ],
                 bindingSpecifier: .keyword(.let),
                 bindings: PatternBindingListSyntax([
                     PatternBindingSyntax(
@@ -467,7 +479,10 @@ extension SettingMacro {
     ) -> MemberBlockItemSyntax {
         MemberBlockItemSyntax(
             decl: VariableDeclSyntax(
-                modifiers: [DeclModifierSyntax(name: .keyword(.static))],
+                modifiers: [
+                    DeclModifierSyntax(name: .keyword(.public)),
+                    DeclModifierSyntax(name: .keyword(.static))
+                ],
                 bindingSpecifier: .keyword(.var),
                 bindings: PatternBindingListSyntax([
                     PatternBindingSyntax(

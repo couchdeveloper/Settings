@@ -165,10 +165,10 @@ struct SettingMacroErrorTests {
                     }
 
                     public enum __Attribute_UserDefaultsStandard_tags: __Attribute {
-                        typealias Container = UserDefaultsStandard
-                        typealias Value = [String]
-                        static let name = "tags"
-                        static let defaultValue: [String] = []
+                        public typealias Container = UserDefaultsStandard
+                        public typealias Value = [String]
+                        public static let name = "tags"
+                        public static let defaultValue: [String] = []
                     }
                     """,
                 macros: ["Setting": SettingMacro.self]
@@ -198,10 +198,10 @@ struct SettingMacroErrorTests {
                     }
 
                     public enum __Attribute_UserDefaultsStandard_settings: __Attribute {
-                        typealias Container = UserDefaultsStandard
-                        typealias Value = [String: Any]
-                        static let name = "settings"
-                        static let defaultValue: [String: Any] = [:]
+                        public typealias Container = UserDefaultsStandard
+                        public typealias Value = [String: Any]
+                        public static let name = "settings"
+                        public static let defaultValue: [String: Any] = [:]
                     }
                     """,
                 macros: ["Setting": SettingMacro.self]
@@ -233,10 +233,10 @@ struct SettingMacroErrorTests {
                     }
 
                     public enum __Attribute_UserDefaultsStandard__privateProperty: __Attribute {
-                        typealias Container = UserDefaultsStandard
-                        typealias Value = String
-                        static let name = "_privateProperty"
-                        static let defaultValue: String = "private"
+                        public typealias Container = UserDefaultsStandard
+                        public typealias Value = String
+                        public static let name = "_privateProperty"
+                        public static let defaultValue: String = "private"
                     }
                     """,
                 macros: ["Setting": SettingMacro.self]
@@ -266,10 +266,10 @@ struct SettingMacroErrorTests {
                     }
 
                     public enum __Attribute_UserDefaultsStandard_setting123: __Attribute {
-                        typealias Container = UserDefaultsStandard
-                        typealias Value = String
-                        static let name = "setting123"
-                        static let defaultValue: String = "test"
+                        public typealias Container = UserDefaultsStandard
+                        public typealias Value = String
+                        public static let name = "setting123"
+                        public static let defaultValue: String = "test"
                     }
                     """,
                 macros: ["Setting": SettingMacro.self]
@@ -299,10 +299,10 @@ struct SettingMacroErrorTests {
                     }
 
                     public enum __Attribute_UserDefaultsStandard_specialKey: __Attribute {
-                        typealias Container = UserDefaultsStandard
-                        typealias Value = String
-                        static let name = "com.myapp.special-key_123"
-                        static let defaultValue: String = "value"
+                        public typealias Container = UserDefaultsStandard
+                        public typealias Value = String
+                        public static let name = "com.myapp.special-key_123"
+                        public static let defaultValue: String = "value"
                     }
                     """,
                 macros: ["Setting": SettingMacro.self]

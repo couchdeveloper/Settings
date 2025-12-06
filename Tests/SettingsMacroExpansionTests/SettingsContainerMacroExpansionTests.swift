@@ -323,11 +323,11 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
 
                         public enum __Attribute_AppSettings_username: __AttributeNonOptional {
-                            typealias Container = AppSettings
-                            typealias Value = String
-                            static let name = "username"
-                            static let defaultValue: String = "anonymous"
-                            static let defaultRegistrar = __DefaultRegistrar()
+                            public typealias Container = AppSettings
+                            public typealias Value = String
+                            public static let name = "username"
+                            public static let defaultValue: String = "anonymous"
+                            public static let defaultRegistrar = __DefaultRegistrar()
                         }
                     
                         public var $username: __AttributeProxy<__Attribute_AppSettings_username> {
@@ -371,11 +371,11 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
 
                         public enum __Attribute_UserPreferences_username: __AttributeNonOptional {
-                            typealias Container = UserPreferences
-                            typealias Value = String
-                            static let name = "user_name"
-                            static let defaultValue: String = "guest"
-                            static let defaultRegistrar = __DefaultRegistrar()
+                            public typealias Container = UserPreferences
+                            public typealias Value = String
+                            public static let name = "user_name"
+                            public static let defaultValue: String = "guest"
+                            public static let defaultRegistrar = __DefaultRegistrar()
                         }
                     
                         public var $username: __AttributeProxy<__Attribute_UserPreferences_username> {
@@ -391,11 +391,11 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
 
                         public enum __Attribute_UserPreferences_theme: __AttributeNonOptional {
-                            typealias Container = UserPreferences
-                            typealias Value = String
-                            static let name = "theme"
-                            static let defaultValue: String = "light"
-                            static let defaultRegistrar = __DefaultRegistrar()
+                            public typealias Container = UserPreferences
+                            public typealias Value = String
+                            public static let name = "theme"
+                            public static let defaultValue: String = "light"
+                            public static let defaultRegistrar = __DefaultRegistrar()
                         }
                     
                         public var $theme: __AttributeProxy<__Attribute_UserPreferences_theme> {
@@ -439,11 +439,11 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
 
                         public enum __Attribute_GameSettings_playerName: __AttributeNonOptional {
-                            typealias Container = GameSettings
-                            typealias Value = String
-                            static let name = "playerName"
-                            static let defaultValue: String = "Player1"
-                            static let defaultRegistrar = __DefaultRegistrar()
+                            public typealias Container = GameSettings
+                            public typealias Value = String
+                            public static let name = "playerName"
+                            public static let defaultValue: String = "Player1"
+                            public static let defaultRegistrar = __DefaultRegistrar()
                         }
                     
                         public var $playerName: __AttributeProxy<__Attribute_GameSettings_playerName> {
@@ -459,11 +459,11 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
 
                         public enum __Attribute_GameSettings_highScore: __AttributeNonOptional {
-                            typealias Container = GameSettings
-                            typealias Value = Int
-                            static let name = "highScore"
-                            static let defaultValue: Int = 0
-                            static let defaultRegistrar = __DefaultRegistrar()
+                            public typealias Container = GameSettings
+                            public typealias Value = Int
+                            public static let name = "highScore"
+                            public static let defaultValue: Int = 0
+                            public static let defaultRegistrar = __DefaultRegistrar()
                         }
                     
                         public var $highScore: __AttributeProxy<__Attribute_GameSettings_highScore> {

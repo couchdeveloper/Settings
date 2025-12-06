@@ -48,11 +48,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
         
             public enum __Attribute_AppSettings_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = Bool
-                static let name = "setting"
-                static let defaultValue: Bool = true
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = Bool
+                public static let name = "setting"
+                public static let defaultValue: Bool = true
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
         
             public var $setting: __AttributeProxy<__Attribute_AppSettings_setting> {
@@ -92,11 +92,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
         
             public enum __Attribute_AppSettings_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = Bool
-                static let name = "setting"
-                static let defaultValue: Bool = true
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = Bool
+                public static let name = "setting"
+                public static let defaultValue: Bool = true
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
         
             public var $setting: __AttributeProxy<__Attribute_AppSettings_setting> {
@@ -141,11 +141,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
 
             public enum __Attribute_AppSettings_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = Bool
-                static let name = "setting"
-                static let defaultValue: Bool = true
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = Bool
+                public static let name = "setting"
+                public static let defaultValue: Bool = true
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
 
             public var $setting: __AttributeProxy<__Attribute_AppSettings_setting> {
@@ -189,11 +189,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
 
             public enum __Attribute_AppSettings_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = Bool
-                static let name = "setting"
-                static let defaultValue: Bool = true
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = Bool
+                public static let name = "setting"
+                public static let defaultValue: Bool = true
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
 
             public var $setting: __AttributeProxy<__Attribute_AppSettings_setting> {
@@ -242,11 +242,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
 
             public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = Bool
-                static let name = "Profile::setting"
-                static let defaultValue: Bool = true
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = Bool
+                public static let name = "Profile::setting"
+                public static let defaultValue: Bool = true
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
 
             public var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
@@ -295,11 +295,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
 
             public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = Bool
-                static let name = "Profile::setting"
-                static let defaultValue: Bool = true
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = Bool
+                public static let name = "Profile::setting"
+                public static let defaultValue: Bool = true
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
 
             public var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
@@ -344,11 +344,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
 
             public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = Bool
-                static let name = "Profile::setting"
-                static let defaultValue: Bool = true
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = Bool
+                public static let name = "Profile::setting"
+                public static let defaultValue: Bool = true
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
 
             public var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
@@ -393,11 +393,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
 
             public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = Bool
-                static let name = "Profile::setting"
-                static let defaultValue: Bool = true
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = Bool
+                public static let name = "Profile::setting"
+                public static let defaultValue: Bool = true
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
 
             public var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
@@ -441,11 +441,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
 
             public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = Bool
-                static let name = "Profile::setting"
-                static let defaultValue: Bool = true
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = Bool
+                public static let name = "Profile::setting"
+                public static let defaultValue: Bool = true
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
 
             public var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
@@ -490,11 +490,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
 
             public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = Bool
-                static let name = "Profile::setting"
-                static let defaultValue: Bool = true
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = Bool
+                public static let name = "Profile::setting"
+                public static let defaultValue: Bool = true
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
 
             public var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
@@ -608,11 +608,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
         
             public enum __Attribute_AppSettings_UserSettings_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = String
-                static let name = "UserSettings::setting"
-                static let defaultValue: String = "default"
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = String
+                public static let name = "UserSettings::setting"
+                public static let defaultValue: String = "default"
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
         
             public var $setting: __AttributeProxy<__Attribute_AppSettings_UserSettings_setting> {
@@ -654,11 +654,11 @@ final class SettingMacroExpansionTests: XCTestCase {
             }
         
             public enum __Attribute_AppSettings_UserSettings_setting: __AttributeNonOptional {
-                typealias Container = AppSettings
-                typealias Value = String
-                static let name = "UserSettings::setting"
-                static let defaultValue: String = "default"
-                static let defaultRegistrar = __DefaultRegistrar()
+                public typealias Container = AppSettings
+                public typealias Value = String
+                public static let name = "UserSettings::setting"
+                public static let defaultValue: String = "default"
+                public static let defaultRegistrar = __DefaultRegistrar()
             }
         
             public var $setting: __AttributeProxy<__Attribute_AppSettings_UserSettings_setting> {
@@ -739,7 +739,7 @@ extension SettingMacroExpansionTests {
             }
             // Extract unwrapped type from Optional
             let unwrappedType = String(valueType.dropLast())
-            return "typealias Wrapped = \(unwrappedType)"
+            return "public typealias Wrapped = \(unwrappedType)"
         }
     }
 
@@ -803,8 +803,8 @@ extension SettingMacroExpansionTests {
         let name = nameOverride ?? nestedNameComponents.joined(separator: "::")
         
         // default decls (only for non-optional)
-        let defaultValueDecl = initializer.isEmpty ? "" : "static let defaultValue: \(testCase.valueType)\(initializer)"
-        let defaultRegistrarDecl = initializer.isEmpty ? "" : "static let defaultRegistrar = __DefaultRegistrar()"
+        let defaultValueDecl = initializer.isEmpty ? "" : "public static let defaultValue: \(testCase.valueType)\(initializer)"
+        let defaultRegistrarDecl = initializer.isEmpty ? "" : "public static let defaultRegistrar = __DefaultRegistrar()"
 
         // make enum name:
         let enumName = "__Attribute_\(testCase.containerQualifiedName.split(separator: ".").joined(separator: "_"))_setting"
@@ -814,10 +814,10 @@ extension SettingMacroExpansionTests {
            attrArgs.contains("(encoding: .json)") {
             encodingBlock =
             """
-            static var encoder: some AttributeEncoding {
+            public static var encoder: some AttributeEncoding {
                 return JSONEncoder()
             }
-            static var decoder: some AttributeDecoding {
+            public static var decoder: some AttributeDecoding {
                 return JSONDecoder()
             }
             """
@@ -846,10 +846,10 @@ extension SettingMacroExpansionTests {
             }
         
             public enum \(enumName): \(testCase.protocolName) {
-                typealias Container = \(containerBaseName)
-                typealias Value = \(testCase.valueType)\
+                public typealias Container = \(containerBaseName)
+                public typealias Value = \(testCase.valueType)\
         \(testCase.wrappedDecl, indentation: 8)
-                static let name = "\(name)"\
+                public static let name = "\(name)"\
         \(defaultValueDecl, indentation: 8)\
         \(defaultRegistrarDecl, indentation: 8)\
         \(encodingBlock, indentation: 8)
