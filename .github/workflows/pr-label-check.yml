@@ -1,0 +1,34 @@
+name: PR Label Check
+
+on:
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize]
+
+jobs:
+  check-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for required label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.pull_request.labels.map(label => label.name);
+            const validLabels = ['breaking', 'enhancement', 'bug', 'documentation', 'skip-release'];
+            const hasValidLabel = labels.some(label => validLabels.includes(label));
+            
+            if (!hasValidLabel) {
+              core.setFailed(
+                '❌ Pull request must have exactly one label: breaking, enhancement, bug, documentation, or skip-release.\n' +
+                'This label determines the version bump and changelog category.'
+              );
+            } else {
+              const matchingLabels = labels.filter(label => validLabels.includes(label));
+              if (matchingLabels.length > 1) {
+                core.setFailed(
+                  `❌ Pull request has multiple category labels: ${matchingLabels.join(', ')}.\n` +
+                  'Please use only ONE label: breaking, enhancement, bug, documentation, or skip-release.'
+                );
+              } else {
+                console.log(`✅ Pull request has valid label: ${matchingLabels[0]}`);
+              }
+            }
