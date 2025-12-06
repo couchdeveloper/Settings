@@ -86,7 +86,7 @@ jobs:
             
             for (const pr of mergedPRs) {
               const labels = pr.labels.map(l => l.name);
-              if (labels.includes('skip-release')) continue;
+              if (labels.includes('not-included-in-release')) continue;
               
               const entry = `- ${pr.title} (#${pr.number})`;
               
@@ -266,7 +266,7 @@ jobs:
             cat /tmp/new_changelog.md >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
           else
-            echo "No changes to release (only documentation or skip-release PRs)" >> $GITHUB_STEP_SUMMARY
+            echo "No changes to release (only documentation or not-included-in-release PRs)" >> $GITHUB_STEP_SUMMARY
           fi
           
       - name: Release summary
@@ -285,4 +285,4 @@ jobs:
           echo "### ℹ️ No Release Needed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "No PRs with breaking, enhancement, or bug labels found since last release." >> $GITHUB_STEP_SUMMARY
-          echo "Only documentation or skip-release changes were merged." >> $GITHUB_STEP_SUMMARY
+          echo "Only documentation or not-included-in-release changes were merged." >> $GITHUB_STEP_SUMMARY

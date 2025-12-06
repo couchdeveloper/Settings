@@ -13,12 +13,12 @@ jobs:
         with:
           script: |
             const labels = context.payload.pull_request.labels.map(label => label.name);
-            const validLabels = ['breaking', 'enhancement', 'bug', 'documentation', 'skip-release'];
+            const validLabels = ['breaking', 'enhancement', 'bug', 'documentation', 'not-included-in-release'];
             const hasValidLabel = labels.some(label => validLabels.includes(label));
             
             if (!hasValidLabel) {
               core.setFailed(
-                '❌ Pull request must have exactly one label: breaking, enhancement, bug, documentation, or skip-release.\n' +
+                '❌ Pull request must have exactly one label: breaking, enhancement, bug, documentation, or not-included-in-release.\n' +
                 'This label determines the version bump and changelog category.'
               );
             } else {
@@ -26,7 +26,7 @@ jobs:
               if (matchingLabels.length > 1) {
                 core.setFailed(
                   `❌ Pull request has multiple category labels: ${matchingLabels.join(', ')}.\n` +
-                  'Please use only ONE label: breaking, enhancement, bug, documentation, or skip-release.'
+                  'Please use only ONE label: breaking, enhancement, bug, documentation, or not-included-in-release.'
                 );
               } else {
                 console.log(`✅ Pull request has valid label: ${matchingLabels[0]}`);

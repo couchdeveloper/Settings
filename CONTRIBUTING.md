@@ -35,7 +35,15 @@ Feature suggestions are welcome! Please:
 3. **Ensure all tests pass**: `swift test`
 4. **Follow Swift style guidelines**: Use SwiftLint if available
 5. **Update documentation** if you're changing APIs
-6. **Write clear commit messages** describing your changes
+6. **Write a clear PR title** that will serve as the changelog entry
+7. **Add a label** to categorize the change:
+   - `breaking` - Breaking API changes (major version bump)
+   - `enhancement` - New features or improvements (minor version bump)
+   - `bug` - Bug fixes (patch version bump)
+   - `documentation` - Documentation-only changes (no version bump)
+   - `not-included-in-release` - Explicitly exclude from release (e.g., internal refactoring, experiments)
+
+**Note**: Pull requests will be squash-merged, so multiple commits in your branch will become a single commit on `main`. By default, all merged PRs are included in releases unless marked with `not-included-in-release`. The PR title and label determine the changelog entry and version bump.
 
 #### Development Setup
 
