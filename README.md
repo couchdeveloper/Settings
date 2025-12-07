@@ -46,7 +46,7 @@ dependencies: [
 Or in Xcode:
 1. File → Add Package Dependencies
 2. Enter: `https://github.com/couchdeveloper/Settings.git`
-3. Select version: 0.1.0 or later
+3. Select version: 0.2.0 or later
 
 ## Features
 
