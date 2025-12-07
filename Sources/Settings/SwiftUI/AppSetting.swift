@@ -2,7 +2,7 @@
 import SwiftUI
 import Combine
 
-/// A default container for UserDefaults that uses the standard store with no prefix.
+/// A default container for UserDefaults that uses a configurable store.
 ///
 /// This container provides a convenient way to define app-wide settings without
 /// needing to create a custom container. Extend this type with `@Setting`
@@ -34,9 +34,26 @@ import Combine
 ///     }
 /// }
 /// ```
+///
+/// ## Store Configuration
+///
+/// By default, `AppSettingValues` uses `UserDefaults.standard`. You can configure
+/// a different store at runtime:
+///
+/// ```swift
+/// // Use a mock store for testing
+/// AppSettingValues.configureStore(UserDefaultsStoreMock())
+///
+/// // Reset to standard
+/// AppSettingValues.resetStore()
+/// ```
+@MainActor
 public struct AppSettingValues: __Settings_Container {
-    public static var store: UserDefaults {
-        UserDefaults.standard
+    
+    fileprivate static var currentStore: any UserDefaultsStore = UserDefaults.standard
+        
+    public static var store: any UserDefaultsStore {
+        currentStore
     }
 }
 
@@ -88,17 +105,39 @@ public struct AppSettingValues: __Settings_Container {
 /// }
 /// ```
 ///
+/// ## Store Configuration
+///
+/// By default, `AppSetting` uses `UserDefaults.standard`. You can configure
+/// a different store at runtime using SwiftUI environment value `userDefaultsStore`:
+///
+/// ```swift
+/// @main
+/// struct ViewAppApp: App {
+///     var body: some Scene {
+///         WindowGroup {
+///             MainView()
+///             .environment(
+///                 \.userDefaultsStore,
+///                 UserDefaultsStoreMock()
+///             )
+///         }
+///     }
+/// }
+/// ```
+///
 /// See the documentation on `AppSettingValues` for additional details.
 ///
 /// The property wrapper observes the specific UserDefaults key and triggers
 /// view updates when the value changes, whether from the current view or elsewhere
 /// in the app.
+@MainActor
 @propertyWrapper
-public struct AppSetting<Attribute: __Attribute>: DynamicProperty
-where Attribute.Value: Sendable, Attribute.Container.Store: UserDefaults {
+public struct AppSetting<Attribute: __Attribute>: @MainActor DynamicProperty
+where Attribute.Value: Sendable {
 
     @State private var value: Attribute.Value
     @State private var cancellable: AnyCancellable?
+    @Environment(\.userDefaultsStore) private var environmentStore
 
     /// The current UserDefaults value.
     public var wrappedValue: Attribute.Value {
@@ -173,6 +212,8 @@ where Attribute.Value: Sendable, Attribute.Container.Store: UserDefaults {
 
     /// Called by SwiftUI to set up the publisher subscription.
     public mutating func update() {
+        AppSettingValues.currentStore = self.environmentStore
+        
         if cancellable == nil {
             cancellable = Attribute.publisher
                 .catch { _ in Just(Attribute.read()) }

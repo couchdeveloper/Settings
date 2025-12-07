@@ -34,6 +34,7 @@ extension TestSettingValues {
     @Setting static var optionalString: String?
 }
 
+@MainActor
 @Suite("AppSetting Property Wrapper Tests", .serialized)
 struct AppSettingTests {
     

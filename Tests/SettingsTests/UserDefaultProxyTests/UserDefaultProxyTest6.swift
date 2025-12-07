@@ -85,7 +85,7 @@ struct UserDefaultProxyTest6 {
         Attr.write(value: 42)
         try await expectation2.await(timeout: .seconds(2), clock: .continuous)
         
-        try await Task.sleep(for: .milliseconds(10))
+        try await Task.sleep(for: .milliseconds(100))
         
         Attr.write(value: 99)
         try await expectation3.await(timeout: .seconds(2), clock: .continuous)

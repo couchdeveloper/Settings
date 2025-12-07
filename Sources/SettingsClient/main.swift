@@ -105,7 +105,7 @@ final class UserProfileObserver {
 }
 
 
-func main() async throws {
+func main1() async throws {
     // let userProfileObserver = UserProfileObserver()
     
     AppSettings2.Profiles.userProfile = .init(id: UUID(), user: "John Appleseed", image: nil)
@@ -128,4 +128,31 @@ final class ViewModel {
 }
 
 
-try await main()
+try await main1()
+
+// MARK: - App
+import SwiftUI
+
+// @main
+struct SettingsView: View {
+    @Environment(\.userDefaultsStore) var settings
+
+    var body: some View {
+        Text(verbatim: "\(settings.dictionaryRepresentation())")
+    }
+}
+
+struct ProductionApp: App {
+    var body: some Scene {
+        WindowGroup {
+            Text("Test")
+            SettingsView()
+        }
+        .environment(\.userDefaultsStore, UserDefaultsStoreMock())
+    }
+}
+
+// #Preview {
+//     SettingsView()
+//         .environment(\.userDefaultsStore, UserDefaultsStoreMock(store: ["user": "John"]))
+// }

@@ -29,6 +29,8 @@ public protocol UserDefaultsStore {
     func set(_ url: URL?, forKey: String)
 
     func register(defaults: [String: Any])
+    
+    func dictionaryRepresentation() -> [String: Any]
 
     func observer(
         forKey: String,
