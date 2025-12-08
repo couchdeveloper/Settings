@@ -1,10 +1,6 @@
 import Foundation
 import Testing
 
-// This is ugly, but UserDefaults is documented to be thread-safe, so this
-// should be OK.
-extension UserDefaults: @retroactive @unchecked Sendable {}
-
 extension UserDefaults {
     func observeKey<Value: Sendable>(_ key: String, valueType _: Value.Type)
         -> AsyncStream<Value?>

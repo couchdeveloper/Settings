@@ -10,7 +10,7 @@ struct UserDefaultsStoreMockTests {
     }
 
     struct TestContainer<Prefix: ConstString>: __Settings_Container {
-        static var store: UserDefaultsStoreMock { UserDefaultsStoreMock.standard }
+        static var store: any UserDefaultsStore { UserDefaultsStoreMock.standard }
         static var prefix: String { Prefix.value }
 
         static func clear() {

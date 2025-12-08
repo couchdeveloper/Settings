@@ -4,7 +4,7 @@ public protocol Cancellable: Sendable {
     func cancel()
 }
 
-public protocol UserDefaultsStore {
+public protocol UserDefaultsStore: Sendable {
 
     associatedtype Observer: Cancellable
 

@@ -190,6 +190,7 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
     public func set(_ url: URL?, forKey key: String) { set(url as Any?, forKey: key) }
     
     public func register(defaults newDefaults: [String : Any]) {
+        print("register(defaults(\(newDefaults)")
         for (key, newDefault) in newDefaults {
             // Only accept property-list-serializable defaults
             guard let copy = plistDeepCopy(newDefault) else { continue }

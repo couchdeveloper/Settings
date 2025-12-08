@@ -9,7 +9,7 @@ import Combine
 // }
 //
 // struct Container<Prefix: ConstString>: __Container {
-//     static var store: UserDefaults { Foundation.UserDefaults.standard }
+//     static var store: any UserDefaultsStore { Foundation.UserDefaults.standard }
 //     static var prefix: String { Prefix.value }
 //
 //     static func clear() {
@@ -132,6 +132,11 @@ try await main1()
 
 // MARK: - App
 import SwiftUI
+
+extension AppSettingValues {
+    @Setting var user: String?
+    @Setting var theme: String = "default"
+}
 
 // @main
 struct SettingsView: View {

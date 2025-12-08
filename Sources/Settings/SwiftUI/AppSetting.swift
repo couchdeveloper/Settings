@@ -1,6 +1,7 @@
 #if canImport(SwiftUI)
 import SwiftUI
 import Combine
+import os
 
 /// A default container for UserDefaults that uses a configurable store.
 ///
@@ -47,13 +48,19 @@ import Combine
 /// // Reset to standard
 /// AppSettingValues.resetStore()
 /// ```
-@MainActor
 public struct AppSettingValues: __Settings_Container {
-    
-    fileprivate static var currentStore: any UserDefaultsStore = UserDefaults.standard
-        
-    public static var store: any UserDefaultsStore {
-        currentStore
+    private static let _store = OSAllocatedUnfairLock<any UserDefaultsStore>(initialState: UserDefaults.standard)
+    public internal(set) static var store: any UserDefaultsStore {
+        get {
+            _store.withLock { store in
+                store
+            }
+        }
+        set {
+            _store.withLock { store in
+                store = newValue
+            }
+        }
     }
 }
 
@@ -136,26 +143,34 @@ public struct AppSetting<Attribute: __Attribute>: @MainActor DynamicProperty
 where Attribute.Value: Sendable {
 
     @State private var value: Attribute.Value
-    @State private var cancellable: AnyCancellable?
+    @State private var observer: Observer = Observer()
     @Environment(\.userDefaultsStore) private var environmentStore
 
     /// The current UserDefaults value.
     public var wrappedValue: Attribute.Value {
-        get { value }
+        get {
+            value
+        }
         nonmutating set {
-            value = newValue
             Attribute.write(value: newValue)
         }
     }
 
     /// Provides a binding to the UserDefaults value.
     public var projectedValue: Binding<Attribute.Value> {
-        $value
+        Binding(
+            get: {
+                value
+            },
+            set: { value in
+                Attribute.write(value: value)
+            }
+        )
     }
 
     /// Creates a new AppSetting property wrapper for the specified attribute.
     public init(_ attribute: Attribute.Type) {
-        self._value = State(initialValue: Attribute.read())
+        self._value = .init(initialValue: Attribute.defaultValue)
     }
 
     /// Creates a new AppSetting property wrapper from a UserDefaults projected value.
@@ -165,7 +180,7 @@ where Attribute.Value: Sendable {
     /// @MyAppSetting(MyAppSettingValues.$username) var username
     /// ```
     public init(_ proxy: __AttributeProxy<Attribute>) {
-        self._value = State(initialValue: Attribute.read())
+        self._value = .init(initialValue: Attribute.defaultValue)
     }
 
     /// Creates a new AppSetting property wrapper using a key path to an
@@ -186,7 +201,7 @@ where Attribute.Value: Sendable {
     public init(
         _ keyPath: KeyPath<AppSettingValues, __AttributeProxy<Attribute>>
     ) where Attribute.Container == AppSettingValues {
-        self._value = State(initialValue: Attribute.read())
+        self._value = .init(initialValue: Attribute.defaultValue)
     }
 
     /// Creates a new AppSetting property wrapper using a key path to a property
@@ -207,22 +222,37 @@ where Attribute.Value: Sendable {
     public init(
         _ keyPath: KeyPath<Attribute.Container, __AttributeProxy<Attribute>>
     ) {
-        self._value = State(initialValue: Attribute.read())
+        self._value = .init(initialValue: Attribute.defaultValue)
     }
 
     /// Called by SwiftUI to set up the publisher subscription.
     public mutating func update() {
-        AppSettingValues.currentStore = self.environmentStore
-        
-        if cancellable == nil {
-            cancellable = Attribute.publisher
-                .catch { _ in Just(Attribute.read()) }
-                .receive(on: DispatchQueue.main)
-                .sink { [wrappedValue = $value] newValue in
-                    wrappedValue.wrappedValue = newValue
-                }
+        AppSettingValues.store = environmentStore
+        if observer.cancellable == nil {
+            observer.start(binding: $value)
         }
     }
 }
 
+extension AppSetting {
+    
+    @MainActor
+    final class Observer {
+        var cancellable: AnyCancellable? = nil
+
+        init() {}
+        
+        func start(binding: Binding<Attribute.Value>) {
+            if cancellable == nil {
+                cancellable = Attribute.publisher
+                .catch { _ in Just(Attribute.read()) }
+                .receive(on: DispatchQueue.main)
+                .sink { newValue in
+                    binding.wrappedValue = newValue
+                }
+            }
+        }
+    }
+    
+}
 #endif

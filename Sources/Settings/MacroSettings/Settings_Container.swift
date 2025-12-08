@@ -1,10 +1,8 @@
 import Foundation
+import os
 
 public protocol __Settings_Container {
-    associatedtype Store: UserDefaultsStore
-    associatedtype Observer: Cancellable
-
-    static var store: Store { get }
+    static var store: any UserDefaultsStore { get }
     static var prefix: String { get }
 
     // MARK: - UserDefaults Operations
@@ -35,7 +33,7 @@ public protocol __Settings_Container {
     static func observer(
         forKey: String,
         update: @escaping @Sendable (Any?, Any?) -> Void
-    ) -> Observer
+    ) -> any Cancellable
 
 }
 
@@ -65,7 +63,7 @@ extension __Settings_Container {
 
 extension __Settings_Container {
     public static var prefix: String { "" }
-    public static var store: Foundation.UserDefaults { .standard }
+    public static var store: any UserDefaultsStore { Foundation.UserDefaults.standard }
 }
 
 // MARK: - Default UserDefaults Operations
@@ -159,7 +157,7 @@ extension __Settings_Container {
     public static func observer(
         forKey key: String,
         update: @escaping @Sendable (Any?, Any?) -> Void
-    ) -> some Cancellable {
+    ) -> any Cancellable {
         self.store.observer(forKey: key, update: update)
     }
 }

@@ -4,7 +4,7 @@ import Settings
 import Utilities
 
 struct ProxyTestContainer6: __Settings_Container {
-    static var store: UserDefaults { .standard }
+    static var store: any UserDefaultsStore { Foundation.UserDefaults.standard }
     nonisolated(unsafe) static var _prefix: String = ""
     static var prefix: String { _prefix }
     
