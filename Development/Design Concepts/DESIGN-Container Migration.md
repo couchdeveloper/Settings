@@ -676,7 +676,7 @@ public class UserDefaultsMigrationManager {
 public protocol UserDefaultsContainer {
     static var version: Int { get }
     static var prefix: String { get }
-    static var store: UserDefaults { get }
+    static var store: any UserDefaultsStore { get }
     
     /// Migration function executed during version transitions
     static func migrate(from oldVersion: Int, to newVersion: Int)

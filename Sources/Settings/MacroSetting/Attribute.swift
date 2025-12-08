@@ -12,6 +12,8 @@ public protocol __Attribute<Container>: SendableMetatype {
     
     static func reset()
     
+    static var defaultValue: Value { get }
+
     static func registerDefault()
     
     static var stream: AsyncThrowingStream<Value, Error> { get }

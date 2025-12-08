@@ -1,8 +1,7 @@
 import Combine
 import Foundation
 
-public protocol __AttributeOptional<Container>: __Attribute {
-    associatedtype Value
+public protocol __AttributeOptional<Container>: __Attribute where Value: ExpressibleByNilLiteral {
     associatedtype Wrapped = Value
     associatedtype Encoder = Never
     associatedtype Decoder = Never
@@ -16,6 +15,7 @@ public protocol __AttributeOptional<Container>: __Attribute {
 
 extension __AttributeOptional {
     public static func registerDefault() { /* nothing */ }
+    public static var defaultValue: Value { nil }
 }
 
 // MARK: - Read / Write

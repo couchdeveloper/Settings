@@ -23,7 +23,7 @@ struct DefaultRegistrarTests {
         
         struct TrackedContainer: __Settings_Container {
             static let tracker = RegistrationTracker()
-            static var store: UserDefaults { .standard }
+            static var store: any UserDefaultsStore { Foundation.UserDefaults.standard }
             static var prefix: String { "DefaultRegistrarTest_" }
             static var suiteName: String? { nil }
             
@@ -107,7 +107,7 @@ protocol ConstString {
 }
 
 struct TestContainer<Prefix: ConstString>: __Settings_Container {
-    static var store: UserDefaults { .standard }
+    static var store: any UserDefaultsStore { Foundation.UserDefaults.standard }
     static var prefix: String { Prefix.value }
     static var suiteName: String? { nil }
     

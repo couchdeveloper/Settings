@@ -58,7 +58,43 @@ Or in Xcode:
 - **Observable** — Built-in `Combine` publishers and `AsyncSequence` streams
 - **Customizable** — Namespaced keys and pluggable encoders/decoders
 
-## Quick Start
+## SwiftUI Integration
+
+```swift
+import Settings
+import SwiftUI
+
+// Special mockable Settings container.
+// Uses UserDefaults.standard per default.
+extension AppSettingValues {
+    @Setting public var score: Int = 0
+}
+
+struct AppSettingsView: View {
+    @AppSetting(\.$score) var score
+
+    var body: some View {
+        Form {
+            TextField("Enter your score", value: $score, format: .number)
+                .textFieldStyle(.roundedBorder)
+                .padding()
+
+            Text("Your score was \(score).")
+        }
+    }
+}
+
+#if DEBUG
+import SettingsMock
+
+#Preview {
+    AppSettingsView()
+        .environment(\.userDefaultsStore, UserDefaultsStoreMock())
+}
+#endif
+```
+
+## Custom Settings Container
 
 ```swift
 import Settings
@@ -72,25 +108,6 @@ struct AppSettings {
 
 AppSettings.username = "Alice"
 print(AppSettings.theme) // "light"
-```
-
-
-## SwiftUI Integration
-
-```swift
-struct SettingsView: View {
-    @State private var theme = AppSettings.theme
-    
-    var body: some View {
-        Picker("Theme", selection: $theme) {
-            Text("Light").tag("light")
-            Text("Dark").tag("dark")
-        }
-        .onChange(of: theme) { _, newValue in
-            AppSettings.theme = newValue
-        }
-    }
-}
 ```
 
 ## Projected Value ($propertyName)

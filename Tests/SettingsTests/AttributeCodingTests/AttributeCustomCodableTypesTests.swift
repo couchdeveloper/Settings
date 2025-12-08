@@ -11,7 +11,7 @@ struct AttributeCustomCodableTypesTests {
     }
 
     struct TestContainer<Prefix: ConstString>: __Settings_Container {
-        static var store: UserDefaults { UserDefaults.standard }
+        static var store: any UserDefaultsStore { UserDefaults.standard }
         static var prefix: String { Prefix.value }
 
         static func clear() {
