@@ -49,16 +49,41 @@ import os
 /// AppSettingValues.resetStore()
 /// ```
 public struct AppSettingValues: __Settings_Container {
-    private static let _store = OSAllocatedUnfairLock<any UserDefaultsStore>(initialState: UserDefaults.standard)
+    struct Config {
+        var store: any UserDefaultsStore = UserDefaults.standard
+        var prefix: String? = nil
+    }
+
+    private static let _config = OSAllocatedUnfairLock<Config>(initialState: Config())
+    
     public internal(set) static var store: any UserDefaultsStore {
         get {
-            _store.withLock { store in
-                store
+            _config.withLock { config in
+                config.store
             }
         }
         set {
-            _store.withLock { store in
-                store = newValue
+            _config.withLock { config in
+                config.store = newValue
+            }
+        }
+    }
+
+    public static var prefix: String {
+        get {
+            _config.withLock { config in
+                if let prefix = config.prefix {
+                    return prefix
+                }
+                guard let identifier = Bundle.main.bundleIdentifier else {
+                    return "app_"
+                }
+                return identifier.replacing(".", with: "_") + "_"
+            }   
+        }
+        set {
+            _config.withLock { config in
+                config.prefix = newValue
             }
         }
     }

@@ -46,7 +46,7 @@ dependencies: [
 Or in Xcode:
 1. File → Add Package Dependencies
 2. Enter: `https://github.com/couchdeveloper/Settings.git`
-3. Select version: 0.2.0 or later
+3. Select version: 0.3.0 or later
 
 ## Features
 
@@ -93,6 +93,26 @@ import SettingsMock
 }
 #endif
 ```
+
+## Set a global key prefix:
+
+```swift 
+@main
+struct MyApp: App {
+    init() {
+        AppSettingValues.prefix = "myapp_"
+    }
+    
+    var body: some Scene {
+        WindowGroup {
+            MainView()
+        }
+    }
+}
+```
+
+> **Note:** When the prefix is not customized, Settings library will use the bundle identifier from the main bundle to derive a unique prefix for every key.
+
 
 ## Custom Settings Container
 
@@ -186,8 +206,8 @@ struct Settings {
 
 ## Requirements
 
-- Swift 6.1
-- macOS 10.15+ / iOS 13.0+ / tvOS 13.0+ / watchOS 6.0+
+- Swift 6.2
+- macOS 10.15+ / iOS 17.0+ / tvOS 17.0+ / watchOS 10.0+
 
 ## Installation
 
@@ -195,7 +215,7 @@ struct Settings {
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/couchdeveloper/UserDefaults.git", from: "0.1.0")
+    .package(url: "https://github.com/couchdeveloper/Settings.git", from: "0.3.0")
 ]
 ```
 
@@ -229,11 +249,6 @@ for try await name in Settings.$user.stream(for: \.name) {
     print("Name:", name)
 }
 ```
-
-## Requirements
-
-- Swift 6.1 or later
-- iOS 17.0+ / macOS 15.0+ / tvOS 17.0+ / watchOS 10.0+
 
 ## Contributing
 
