@@ -3,6 +3,7 @@ import SettingsMock
 import Foundation
 import Observation
 import Combine
+import os
 
 // protocol ConstString {
 //     static var value: String { get }
@@ -45,6 +46,10 @@ import Combine
 //
 // print("Hello UserDefaults!")
 // try test()
+
+@Settings struct Settings1 {
+    @Setting var setting: String = "default"
+}
 
 @Settings(prefix: "app_") struct Settings {
     @Setting var setting: String = "default"

@@ -4,37 +4,76 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 
-/// Implementation of the `@Settings` container macro
-///
-/// This macro generates the prefix property for a container type.
-/// The container must manually conform to `__Settings_Container`.
-public struct SettingsMacro: MemberMacro, ExtensionMacro {
+public struct SettingsMacro {}
 
-    struct Attributes {
-        var prefix: String
-        var suiteName: String?
-    }
+extension SettingsMacro: MemberMacro {
 
-    // MARK: - MemberMacro Implementation
-
+    // Implementation of the `@Settings` container macro
+    //
+    // This macro generates the configuration infrastructure for a container type.
+    // The container must manually conform to `__Settings_Container`.
     public static func expansion(
-        of node: SwiftSyntax.AttributeSyntax,
-        providingMembersOf declaration: some SwiftSyntax.DeclGroupSyntax,
-        conformingTo protocols: [SwiftSyntax.TypeSyntax],
-        in context: some SwiftSyntaxMacros.MacroExpansionContext
-    ) throws -> [SwiftSyntax.DeclSyntax] {
+        of node: AttributeSyntax,
+        providingMembersOf decl: some DeclGroupSyntax,
+        conformingTo protocols: [TypeSyntax],
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
 
-        // We only need this of we implement ObservableStore / ObservableAttribute
-        // // Generate property `tokens`:
-        // let tokensDecl: DeclSyntax = """
-        // private let tokens = TokenStore<Store.ObservationToken>()
-        // """
-        //
-        // return [tokensDecl]
-        return []
+        // Extract the prefix from the macro arguments
+        let initialPrefix: String? = try extractPrefix(from: node)
+        if let prefix = initialPrefix {
+            try validatePrefix(prefix)
+        }
+        let literalPrefix = initialPrefix == nil ? "" : initialPrefix!
+
+        let declSyntax = DeclSyntax(
+            """
+            struct Config {
+                var store: any UserDefaultsStore = Foundation.UserDefaults.standard
+                var prefix: String = "\(raw: literalPrefix)"
+            }
+
+            private static let _config = OSAllocatedUnfairLock(initialState: Config())
+
+            public internal(set) static var store: any UserDefaultsStore {
+                get {
+                    _config.withLock { config in
+                        config.store
+                    }
+                }
+                set {
+                    _config.withLock { config in
+                        config.store = newValue
+                    }
+                }
+            }
+
+            public static var prefix: String {
+                get {
+                    _config.withLock { config in
+                        config.prefix
+                    }
+                }
+                set {
+                    _config.withLock { config in
+                        config.prefix = newValue.replacing(".", with: "_")
+                    }
+                }
+            }
+            """
+        )
+        return [declSyntax]
     }
+}
+
+extension SettingsMacro: ExtensionMacro {
 
     // MARK: Extension Macro Implementation
+
+    struct Attributes {
+        var prefix: String?
+        var suiteName: String?
+    }
 
     static func validatePrefix(_ prefix: String) throws {
         // The prefix string needs to be KVC compliant.
@@ -53,101 +92,17 @@ public struct SettingsMacro: MemberMacro, ExtensionMacro {
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
 
-        // Extract the prefix and suiteName from the macro arguments
-        let prefix = try extractPrefix(from: node)
-        try validatePrefix(prefix)
-        let suiteName = try extractSuiteName(from: node)
-
-        // Generate the static prefix property
-        let prefixProperty = MemberBlockItemSyntax(
-            decl: VariableDeclSyntax(
-                modifiers: [
-                    DeclModifierSyntax(name: .keyword(.public)),
-                    DeclModifierSyntax(name: .keyword(.static)),
-                ],
-                bindingSpecifier: .keyword(.let),
-                bindings: PatternBindingListSyntax([
-                    PatternBindingSyntax(
-                        pattern: IdentifierPatternSyntax(
-                            identifier: .identifier("prefix")
-                        ),
-                        typeAnnotation: TypeAnnotationSyntax(
-                            type: IdentifierTypeSyntax(
-                                name: .identifier("String")
-                            )
-                        ),
-                        initializer: InitializerClauseSyntax(
-                            value: StringLiteralExprSyntax(content: prefix)
-                        )
-                    )
-                ])
-            )
-        )
-
-        // Generate the static suiteName property
-        let suiteNameProperty = MemberBlockItemSyntax(
-            decl: VariableDeclSyntax(
-                modifiers: [
-                    DeclModifierSyntax(name: .keyword(.public)),
-                    DeclModifierSyntax(name: .keyword(.static)),
-                ],
-                bindingSpecifier: .keyword(.let),
-                bindings: PatternBindingListSyntax([
-                    PatternBindingSyntax(
-                        pattern: IdentifierPatternSyntax(
-                            identifier: .identifier("suiteName")
-                        ),
-                        typeAnnotation: TypeAnnotationSyntax(
-                            type: OptionalTypeSyntax(
-                                wrappedType: IdentifierTypeSyntax(
-                                    name: .identifier("String")
-                                )
-                            )
-                        ),
-                        initializer: InitializerClauseSyntax(
-                            value: suiteName != nil
-                                ? ExprSyntax(
-                                    StringLiteralExprSyntax(content: suiteName!)
-                                )
-                                : ExprSyntax(NilLiteralExprSyntax())
-                        )
-                    )
-                ])
-            )
-        )
-
-        // Check if the type already has prefix or suiteName properties defined
-        let hasExistingPrefix = hasExistingProperty(
-            named: "prefix",
-            in: declaration
-        )
-        let hasExistingSuiteName = hasExistingProperty(
-            named: "suiteName",
-            in: declaration
-        )
-
-        // Only add properties that don't already exist
-        var members: [MemberBlockItemSyntax] = []
-        if !hasExistingPrefix {
-            members.append(prefixProperty)
-        }
-        if !hasExistingSuiteName {
-            members.append(suiteNameProperty)
-        }
-
         // Generate an extension that adds conformance to __Settings_Container
-        // and includes only the missing properties
         let extensionDecl = ExtensionDeclSyntax(
-            extensionKeyword: .keyword(.extension),
             extendedType: type,
             inheritanceClause: InheritanceClauseSyntax {
                 InheritedTypeSyntax(
-                    type: IdentifierTypeSyntax(name: .identifier("__Settings_Container"))
+                    type: IdentifierTypeSyntax(
+                        name: .identifier("__Settings_Container")
+                    )
                 )
             },
-            memberBlock: MemberBlockSyntax(
-                members: MemberBlockItemListSyntax(members)
-            )
+            memberBlock: MemberBlockSyntax(members: [])
         )
 
         return [extensionDecl]
@@ -167,35 +122,14 @@ extension SettingsMacro {
         )
     }
 
-    /// Check if a type declaration already has a property with the given name
-    private static func hasExistingProperty(
-        named propertyName: String,
-        in declaration: some DeclGroupSyntax
-    ) -> Bool {
-        // Check the member list for existing properties
-        for member in declaration.memberBlock.members {
-            if let varDecl = member.decl.as(VariableDeclSyntax.self) {
-                for binding in varDecl.bindings {
-                    if let identifier = binding.pattern.as(
-                        IdentifierPatternSyntax.self
-                    ),
-                        identifier.identifier.text == propertyName
-                    {
-                        return true
-                    }
-                }
-            }
-        }
-        return false
-    }
-
-    /// Extracts the prefix parameter from the macro arguments
+    /// Extracts the prefix parameter from the macro arguments.
+    /// Returns `nil` if no prefix is specified.
     private static func extractPrefix(from node: AttributeSyntax) throws
-        -> String
+        -> String?
     {
         guard let arguments = node.arguments?.as(LabeledExprListSyntax.self)
         else {
-            return ""  // Default to empty prefix if no arguments
+            return nil  // Default to nil if no arguments
         }
 
         for argument in arguments {
@@ -221,7 +155,7 @@ extension SettingsMacro {
                 .content.text ?? ""
         }
 
-        return ""  // Default to empty prefix
+        return nil  // Default to nil prefix
     }
 
     /// Extracts the suiteName parameter from the macro arguments
@@ -248,20 +182,4 @@ extension SettingsMacro {
         return nil  // Default to nil if suiteName not found
     }
 
-    /// Gets the container type name from the declaration
-    private static func getContainerTypeName(
-        from declaration: some DeclGroupSyntax
-    ) throws -> String {
-        if let structDecl = declaration.as(StructDeclSyntax.self) {
-            return structDecl.name.text
-        } else if let classDecl = declaration.as(ClassDeclSyntax.self) {
-            return classDecl.name.text
-        } else if let enumDecl = declaration.as(EnumDeclSyntax.self) {
-            return enumDecl.name.text
-        } else if let actorDecl = declaration.as(ActorDeclSyntax.self) {
-            return actorDecl.name.text
-        } else {
-            throw MacroError.invalidContainerType
-        }
-    }
 }

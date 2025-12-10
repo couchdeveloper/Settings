@@ -58,12 +58,13 @@
 ///
 /// // SwiftUI views automatically update when settings.hasSeenOnboarding changes
 /// ```
-@attached(member)
+@attached(
+    member,
+    names: named(Config), named(_config), named(store), named(prefix)
+)
 @attached(
     extension,
-    conformances: __Settings_Container,
-    names: named(prefix),
-    named(suiteName)
+    conformances: __Settings_Container
 )
 public macro Settings(
     prefix: String? = nil,
