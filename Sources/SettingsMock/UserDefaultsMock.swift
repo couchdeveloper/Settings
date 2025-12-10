@@ -55,13 +55,13 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
         }
     }
     
-    private func plistDeepCopy(_ value: Any) -> Any? {
+    private static func plistDeepCopy(_ value: Any) -> Any? {
         guard PropertyListSerialization.propertyList(value, isValidFor: .binary) else { return nil }
         guard let data = try? PropertyListSerialization.data(fromPropertyList: value, format: .binary, options: 0) else { return nil }
         return try? PropertyListSerialization.propertyList(from: data, options: [], format: nil)
     }
     
-    private func isEqualPlist(_ lhs: Any?, _ rhs: Any?) -> Bool {
+    private static func isEqualPlist(_ lhs: Any?, _ rhs: Any?) -> Bool {
         switch (lhs, rhs) {
         case (nil, nil):
             return true
@@ -97,14 +97,14 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
     public func set(_ value: Any?, forKey key: String) {
         if let value {
             // Only accept property-list-serializable values; mimic UserDefaults by ignoring unsupported values.
-            guard let stored = plistDeepCopy(value) else {
+            guard let stored = Self.plistDeepCopy(value) else {
                 return
             }
             var oldEffective: Any?
             state.withLockUnchecked { state in
                 oldEffective = state.values[key] ?? state.defaults[key]
             }
-            let shouldNotify = !isEqualPlist(oldEffective, stored)
+            let shouldNotify = !Self.isEqualPlist(oldEffective, stored)
             if shouldNotify { willChangeValue(forKey: key) }
             state.withLockUnchecked { state in
                 state.values[key] = stored
@@ -118,7 +118,7 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
                 oldEffective = state.values[key] ?? state.defaults[key]
                 newEffective = state.defaults[key]
             }
-            let shouldNotify = !isEqualPlist(oldEffective, newEffective)
+            let shouldNotify = !Self.isEqualPlist(oldEffective, newEffective)
             if shouldNotify { willChangeValue(forKey: key) }
             state.withLock { state in
                 _ = state.values.removeValue(forKey: key)
@@ -190,10 +190,10 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
     public func set(_ url: URL?, forKey key: String) { set(url as Any?, forKey: key) }
     
     public func register(defaults newDefaults: [String : Any]) {
-        print("register(defaults(\(newDefaults)")
+        print(Self.self, "register(defaults(\(newDefaults)")
         for (key, newDefault) in newDefaults {
             // Only accept property-list-serializable defaults
-            guard let copy = plistDeepCopy(newDefault) else { continue }
+            guard let copy = Self.plistDeepCopy(newDefault) else { continue }
 
             var hasUserValue = false
             var oldEffective: Any?
@@ -204,7 +204,7 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
                 newEffective = hasUserValue ? state.values[key] : copy
             }
 
-            let shouldNotify = !hasUserValue && !isEqualPlist(oldEffective, newEffective)
+            let shouldNotify = !hasUserValue && !Self.isEqualPlist(oldEffective, newEffective)
             if shouldNotify { willChangeValue(forKey: key) }
             state.withLockUnchecked { state in
                 state.defaults[key] = copy

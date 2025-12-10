@@ -83,7 +83,7 @@ public struct AppSettingValues: __Settings_Container {
         }
         set {
             _config.withLock { config in
-                config.prefix = newValue
+                config.prefix = newValue.replacing(".", with: "_")
             }
         }
     }
@@ -185,10 +185,10 @@ where Attribute.Value: Sendable {
     public var projectedValue: Binding<Attribute.Value> {
         Binding(
             get: {
-                value
+                wrappedValue
             },
             set: { value in
-                Attribute.write(value: value)
+                wrappedValue = value
             }
         )
     }
@@ -252,10 +252,11 @@ where Attribute.Value: Sendable {
 
     /// Called by SwiftUI to set up the publisher subscription.
     public mutating func update() {
-        AppSettingValues.store = environmentStore
-        if observer.cancellable == nil {
-            observer.start(binding: $value)
+        if !(AppSettingValues.store === environmentStore) {
+            AppSettingValues.store = environmentStore
         }
+        // print("*** SwiftUI update: \(AppSettingValues.store.dictionaryRepresentation())")
+        observer.observe(binding: $value)
     }
 }
 
@@ -264,18 +265,30 @@ extension AppSetting {
     @MainActor
     final class Observer {
         var cancellable: AnyCancellable? = nil
+        weak var usersDefaultsStore: (any UserDefaultsStore)?
 
         init() {}
         
-        func start(binding: Binding<Attribute.Value>) {
+        func observe(binding: Binding<Attribute.Value>) {
+            // When the store of the attribute has changed, we need
+            // to cancel the subscription and create a new one:
+            if !(usersDefaultsStore === Attribute.Container.store) {
+                cancel()
+            }
             if cancellable == nil {
+                usersDefaultsStore = Attribute.Container.store
                 cancellable = Attribute.publisher
                 .catch { _ in Just(Attribute.read()) }
                 .receive(on: DispatchQueue.main)
                 .sink { newValue in
+                    print("Observer: \(Attribute.self) = \(newValue)")
                     binding.wrappedValue = newValue
                 }
             }
+        }
+        
+        func cancel() {
+            cancellable = nil
         }
     }
     
