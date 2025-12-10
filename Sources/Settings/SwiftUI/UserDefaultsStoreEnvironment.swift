@@ -23,7 +23,24 @@ extension EnvironmentValues {
     ///     }
     /// }
     /// ```
-    @Entry public var userDefaultsStore: any UserDefaultsStore = UserDefaults.standard
+    public var userDefaultsStore: any UserDefaultsStore {
+        get {
+            self[__Key_userDefaultsStore.self]
+        }
+        set {
+            self[__Key_userDefaultsStore.self] = newValue
+        }
+    }
+    
+    private struct __Key_userDefaultsStore: SwiftUICore.EnvironmentKey {
+        
+        static var defaultValue: any UserDefaultsStore {
+            get {
+                UserDefaults.standard
+            }
+        }
+    }
+    
 }
 
 extension View {
