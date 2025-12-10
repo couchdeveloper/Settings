@@ -46,7 +46,7 @@ dependencies: [
 Or in Xcode:
 1. File → Add Package Dependencies
 2. Enter: `https://github.com/couchdeveloper/Settings.git`
-3. Select version: 0.3.0 or later
+3. Select version: 0.4.0 or later
 
 ## Features
 
@@ -215,7 +215,7 @@ struct Settings {
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/couchdeveloper/Settings.git", from: "0.3.0")
+    .package(url: "https://github.com/couchdeveloper/Settings.git", from: "0.4.0")
 ]
 ```
 
