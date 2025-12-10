@@ -1,7 +1,7 @@
+import SettingsMacros
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
 import Testing
-import SettingsMacros
 
 @Suite("UserDefault Macro Error Tests")
 struct SettingMacroErrorTests {

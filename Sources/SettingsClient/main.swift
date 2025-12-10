@@ -1,8 +1,10 @@
-import Settings
-import SettingsMock
+import Combine
 import Foundation
 import Observation
-import Combine
+import Settings
+import SettingsMock
+// MARK: - App
+import SwiftUI
 import os
 
 // protocol ConstString {
@@ -55,49 +57,54 @@ import os
     @Setting var setting: String = "default"
 }
 
-
 @Settings struct AppSettings {}
-extension AppSettings { enum UserSettings {
-    @Setting var setting: String = "default"
-    @Setting var theme: String?
-} }
+extension AppSettings {
+    enum UserSettings {
+        @Setting var setting: String = "default"
+        @Setting var theme: String?
+    }
+}
 
 @Settings(prefix: "app_") struct AppSettings1 {}
-extension AppSettings1 { enum UserSettings {
-    @Setting var setting: String = "default"
-    @Setting var theme: String?
-} }
-
+extension AppSettings1 {
+    enum UserSettings {
+        @Setting var setting: String = "default"
+        @Setting var theme: String?
+    }
+}
 
 @Settings(prefix: "com_example_MyApp_")
 struct AppSettings2 {
     @Setting static var username: String = "Guest"  // Default value "Guest"
-    @Setting(name: "colorScheme") static var theme: String = "light" //  key = "colorScheme"
+    @Setting(name: "colorScheme") static var theme: String = "light"  //  key = "colorScheme"
     @Setting static var apiKey: String?  // Optionals don't have default values
     @Setting(name: "value") var primitive: Int = 42
 }
 
-extension AppSettings2 { enum Profiles {
-    struct UserProfile: Equatable, Codable, Identifiable {
-        var id: UUID
-        var user: String
-        var image: URL?
-    }
+extension AppSettings2 {
+    enum Profiles {
+        struct UserProfile: Equatable, Codable, Identifiable {
+            var id: UUID
+            var user: String
+            var image: URL?
+        }
 
-    @Setting(encoding: .json)
-    static var userProfile: UserProfile? //
-    
-    @Setting var setting = "abc"
-}}
+        @Setting(encoding: .json)
+        static var userProfile: UserProfile?  //
+
+        @Setting var setting = "abc"
+    }
+}
 
 final class UserProfileObserver {
-    var subscriptions: Array<AnyCancellable> = []
-    
+    var subscriptions: [AnyCancellable] = []
+
     init() {
         AppSettings2.Profiles.$userProfile.publisher.sink(
             receiveCompletion: { error in
                 print(error)
-            }, receiveValue: { value in
+            },
+            receiveValue: { value in
                 switch value {
                 case .none:
                     print("No user profile")
@@ -109,34 +116,30 @@ final class UserProfileObserver {
     }
 }
 
-
 func main1() async throws {
     // let userProfileObserver = UserProfileObserver()
-    
-    AppSettings2.Profiles.userProfile = .init(id: UUID(), user: "John Appleseed", image: nil)
-    print(AppSettings2.theme) // "light"
+
+    AppSettings2.Profiles.userProfile = .init(
+        id: UUID(),
+        user: "John Appleseed",
+        image: nil
+    )
+    print(AppSettings2.theme)  // "light"
     print(AppSettings2.Profiles.$userProfile.key)
 
     try await Task.sleep(for: .milliseconds(1000))
 }
-
-
-import Observation
 
 @Observable
 final class ViewModel {
     @Settings struct Settings {
         @Setting var hasSeenOnboarding = false
     }
-    
+
     var settings = Settings()
 }
 
-
 try await main1()
-
-// MARK: - App
-import SwiftUI
 
 extension AppSettingValues {
     @Setting var user: String?

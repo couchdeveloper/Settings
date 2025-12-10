@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 import Settings
+import Testing
 
 /// Tests for encoding/decoding of UserDefault values
 /// Verifies JSON and PropertyList encoding/decoding work correctly

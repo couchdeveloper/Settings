@@ -1,11 +1,11 @@
 import Foundation
-import os
 import Settings
+import os
 
-public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable {
-    
+public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable
+{
     public static let standard: UserDefaultsStoreMock = .init(store: [:])
-    
+
     struct State: @unchecked Sendable {
         init(store: sending [String: Any] = [:]) {
             self.values = store
@@ -14,58 +14,77 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
         var values: [String: Any]
         var defaults: [String: Any]
     }
-    
+
     public init(store: [String: Any]) {
         var sanitized: [String: Any] = [:]
         for (k, v) in store {
             if PropertyListSerialization.propertyList(v, isValidFor: .binary),
-              let data = try? PropertyListSerialization.data(fromPropertyList: v, format: .binary, options: 0),
-              let copy = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil) {
+                let data = try? PropertyListSerialization.data(
+                    fromPropertyList: v,
+                    format: .binary,
+                    options: 0
+                ),
+                let copy = try? PropertyListSerialization.propertyList(
+                    from: data,
+                    options: [],
+                    format: nil
+                )
+            {
                 sanitized[k] = copy
             }
         }
         state = OSAllocatedUnfairLock(initialState: State(store: sanitized))
         super.init()
     }
-    
+
     override public init() {
         state = OSAllocatedUnfairLock(initialState: State())
         super.init()
     }
-    
+
     let state: OSAllocatedUnfairLock<State>
-    
-    
+
     public func reset() {
         state.withLock { state in
             state.values.removeAll()
         }
     }
-    
+
     public func clear() {
         state.withLock { state in
             state.values.removeAll()
             state.defaults.removeAll()
         }
     }
-    
+
     public func unregisterDefaults() {
         state.withLock { state in
             state.defaults.removeAll()
         }
     }
-    
+
     private static func plistDeepCopy(_ value: Any) -> Any? {
-        guard PropertyListSerialization.propertyList(value, isValidFor: .binary) else { return nil }
-        guard let data = try? PropertyListSerialization.data(fromPropertyList: value, format: .binary, options: 0) else { return nil }
-        return try? PropertyListSerialization.propertyList(from: data, options: [], format: nil)
+        guard PropertyListSerialization.propertyList(value, isValidFor: .binary)
+        else { return nil }
+        guard
+            let data = try? PropertyListSerialization.data(
+                fromPropertyList: value,
+                format: .binary,
+                options: 0
+            )
+        else { return nil }
+        return try? PropertyListSerialization.propertyList(
+            from: data,
+            options: [],
+            format: nil
+        )
     }
-    
+
     private static func isEqualPlist(_ lhs: Any?, _ rhs: Any?) -> Bool {
         switch (lhs, rhs) {
         case (nil, nil):
             return true
-        case let (l?, r?):
+        case (let l?, let r?):
             if let lo = l as? NSObject, let ro = r as? NSObject {
                 return lo.isEqual(ro)
             }
@@ -74,13 +93,13 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
             return false
         }
     }
-    
+
     private func readEffectiveValue(forKey key: String) -> Any? {
         state.withLockUnchecked { state in
             state.values[key] ?? state.defaults[key]
         }
     }
-    
+
     private func number(from any: Any) -> NSNumber? {
         if let n = any as? NSNumber { return n }
         if let i = any as? Int { return NSNumber(value: i) }
@@ -89,11 +108,11 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
         if let b = any as? Bool { return NSNumber(value: b) }
         return nil
     }
-    
+
     public func object(forKey key: String) -> Any? {
         readEffectiveValue(forKey: key)
     }
-    
+
     public func set(_ value: Any?, forKey key: String) {
         if let value {
             // Only accept property-list-serializable values; mimic UserDefaults by ignoring unsupported values.
@@ -126,70 +145,80 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
             if shouldNotify { didChangeValue(forKey: key) }
         }
     }
-    
+
     public func removeObject(forKey key: String) {
         set(nil, forKey: key)
     }
-    
+
     public func string(forKey key: String) -> String? {
         readEffectiveValue(forKey: key) as? String
     }
-    
+
     public func array(forKey key: String) -> [Any]? {
         readEffectiveValue(forKey: key) as? [Any]
     }
-    
-    public func dictionary(forKey key: String) -> [String : Any]? {
-        readEffectiveValue(forKey: key) as? [String : Any]
+
+    public func dictionary(forKey key: String) -> [String: Any]? {
+        readEffectiveValue(forKey: key) as? [String: Any]
     }
-    
+
     public func data(forKey key: String) -> Data? {
         readEffectiveValue(forKey: key) as? Data
     }
-    
+
     public func stringArray(forKey key: String) -> [String]? {
         readEffectiveValue(forKey: key) as? [String]
     }
-    
+
     public func integer(forKey key: String) -> Int {
         guard let v = readEffectiveValue(forKey: key) else { return 0 }
         if let i = v as? Int { return i }
         if let n = number(from: v) { return n.intValue }
         return 0
     }
-    
+
     public func float(forKey key: String) -> Float {
         guard let v = readEffectiveValue(forKey: key) else { return 0 }
         if let f = v as? Float { return f }
         if let n = number(from: v) { return n.floatValue }
         return 0
     }
-    
+
     public func double(forKey key: String) -> Double {
         guard let v = readEffectiveValue(forKey: key) else { return 0 }
         if let d = v as? Double { return d }
         if let n = number(from: v) { return n.doubleValue }
         return 0
     }
-    
+
     public func bool(forKey key: String) -> Bool {
         guard let v = readEffectiveValue(forKey: key) else { return false }
         if let b = v as? Bool { return b }
         if let n = number(from: v) { return n.boolValue }
         return false
     }
-    
+
     public func url(forKey key: String) -> URL? {
         readEffectiveValue(forKey: key) as? URL
     }
-    
-    public func set(_ value: Int, forKey key: String) { set(value as Any, forKey: key) }
-    public func set(_ value: Float, forKey key: String) { set(value as Any, forKey: key) }
-    public func set(_ value: Double, forKey key: String) { set(value as Any, forKey: key) }
-    public func set(_ value: Bool, forKey key: String) { set(value as Any, forKey: key) }
-    public func set(_ url: URL?, forKey key: String) { set(url as Any?, forKey: key) }
-    
-    public func register(defaults newDefaults: [String : Any]) {
+
+    public func set(_ value: Int, forKey key: String) {
+        set(value as Any, forKey: key)
+    }
+    public func set(_ value: Float, forKey key: String) {
+        set(value as Any, forKey: key)
+    }
+    public func set(_ value: Double, forKey key: String) {
+        set(value as Any, forKey: key)
+    }
+    public func set(_ value: Bool, forKey key: String) {
+        set(value as Any, forKey: key)
+    }
+    public func set(_ url: URL?, forKey key: String) {
+        set(url as Any?, forKey: key)
+    }
+
+    public func register(defaults newDefaults: [String: Any]) {
         print(Self.self, "register(defaults(\(newDefaults)")
         for (key, newDefault) in newDefaults {
             // Only accept property-list-serializable defaults
@@ -204,7 +233,8 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
                 newEffective = hasUserValue ? state.values[key] : copy
             }
 
-            let shouldNotify = !hasUserValue && !Self.isEqualPlist(oldEffective, newEffective)
+            let shouldNotify =
+                !hasUserValue && !Self.isEqualPlist(oldEffective, newEffective)
             if shouldNotify { willChangeValue(forKey: key) }
             state.withLockUnchecked { state in
                 state.defaults[key] = copy
@@ -212,16 +242,16 @@ public final class UserDefaultsStoreMock: NSObject, UserDefaultsStore, Sendable 
             if shouldNotify { didChangeValue(forKey: key) }
         }
     }
-    
+
     public override func value(forKey key: String) -> Any? {
         object(forKey: key)
     }
-    
+
     public override func setValue(_ value: Any?, forKey key: String) {
         set(value, forKey: key)
     }
-    
-    public func dictionaryRepresentation() -> [String : Any] {
+
+    public func dictionaryRepresentation() -> [String: Any] {
         state.withLockUnchecked { state in
             var values = state.values
             values.merge(state.defaults, uniquingKeysWith: { lhs, rhs in lhs })
@@ -248,8 +278,9 @@ extension UserDefaultsStoreMock {
 
 }
 
-
-final class UserDefaultsStoreMockObserver: NSObject, Cancellable, @unchecked Sendable {
+final class UserDefaultsStoreMockObserver: NSObject, Cancellable,
+    @unchecked Sendable
+{
 
     typealias StoreChangeCallback =
         @Sendable (_ keyPath: String?, _ oldValue: Any?, _ newValue: Any?) ->
@@ -292,7 +323,10 @@ final class UserDefaultsStoreMockObserver: NSObject, Cancellable, @unchecked Sen
         change: [NSKeyValueChangeKey: Any]?,
         context: UnsafeMutableRawPointer?
     ) {
-        assert(keyPath == key, "KVO notification received for unexpected keyPath: \(keyPath ?? "nil"), expected: \(key)")
+        assert(
+            keyPath == key,
+            "KVO notification received for unexpected keyPath: \(keyPath ?? "nil"), expected: \(key)"
+        )
         callback(keyPath, change?[.oldKey], change?[.newKey])
     }
 
@@ -303,4 +337,3 @@ final class UserDefaultsStoreMockObserver: NSObject, Cancellable, @unchecked Sen
         }
     }
 }
-

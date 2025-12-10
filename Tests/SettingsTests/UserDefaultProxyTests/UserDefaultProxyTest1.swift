@@ -1,16 +1,16 @@
 import Foundation
-import Testing
 import Settings
+import Testing
 
 struct ProxyTestContainer1: __Settings_Container {
     static var store: any UserDefaultsStore { Foundation.UserDefaults.standard }
     nonisolated(unsafe) static var _prefix: String = ""
     static var prefix: String { _prefix }
-    
+
     static func setPrefix(_ newPrefix: String) {
         _prefix = newPrefix
     }
-    
+
     static func clear() {
         store.dictionaryRepresentation().keys
             .filter { $0.hasPrefix(prefix) }
@@ -19,8 +19,8 @@ struct ProxyTestContainer1: __Settings_Container {
 }
 
 struct UserDefaultProxyTest1 {
-    
-    @Test 
+
+    @Test
     func testProxyNonOptional() async throws {
         ProxyTestContainer1.setPrefix("testProxyNonOptional_")
         ProxyTestContainer1.clear()
@@ -38,7 +38,7 @@ struct UserDefaultProxyTest1 {
 
         #expect(proxy.wrappedValue == "default")
         #expect(proxy.key.contains("proxyString"))
-        
+
         proxy.wrappedValue = "updated"
         #expect(Attr.read() == "updated")
         #expect(proxy.wrappedValue == "updated")

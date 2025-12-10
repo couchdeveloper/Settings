@@ -1,18 +1,18 @@
-import Foundation
-import Testing
-import Settings
 import Combine
+import Foundation
+import Settings
+import Testing
 import Utilities
 
 struct ProxyTestContainer4: __Settings_Container {
     static var store: any UserDefaultsStore { Foundation.UserDefaults.standard }
     nonisolated(unsafe) static var _prefix: String = ""
     static var prefix: String { _prefix }
-    
+
     static func setPrefix(_ newPrefix: String) {
         _prefix = newPrefix
     }
-    
+
     static func clear() async {
         let keysToRemove = store.dictionaryRepresentation().keys
             .filter { $0.hasPrefix(prefix) }
@@ -22,8 +22,8 @@ struct ProxyTestContainer4: __Settings_Container {
 }
 
 struct UserDefaultProxyTest4 {
-    
-    @Test 
+
+    @Test
     func testProxyPublisherOptional() async throws {
         ProxyTestContainer4.setPrefix("testProxyPublisherOptional_")
         await ProxyTestContainer4.clear()
@@ -36,27 +36,27 @@ struct UserDefaultProxyTest4 {
         }
 
         let proxy = __AttributeProxy<AttrOpt>(attributeType: AttrOpt.self)
-        
+
         actor ValueCollector {
             var values: [String?] = []
             var callCount = 0
-            
+
             func append(_ value: String?) -> Int {
                 values.append(value)
                 callCount += 1
                 return callCount
             }
-            
+
             func getValues() -> [String?] {
                 values
             }
         }
-        
+
         let collector = ValueCollector()
         let expectation1 = Expectation(minFulfillCount: 1)
         let expectation2 = Expectation(minFulfillCount: 1)
         let expectation3 = Expectation(minFulfillCount: 1)
-        
+
         let cancellable = proxy.publisher
             .sink(
                 receiveCompletion: { _ in },
@@ -73,21 +73,21 @@ struct UserDefaultProxyTest4 {
                     }
                 }
             )
-        
+
         try await expectation1.await(timeout: .seconds(2), clock: .continuous)
-        
+
         AttrOpt.write(value: "exists")
         try await expectation2.await(timeout: .seconds(2), clock: .continuous)
-        
+
         AttrOpt.write(value: nil)
         try await expectation3.await(timeout: .seconds(2), clock: .continuous)
-        
+
         let receivedValues = await collector.getValues()
         #expect(receivedValues.count == 3)
         #expect(receivedValues[0] == nil)
         #expect(receivedValues[1] == "exists")
         #expect(receivedValues[2] == nil)
-        
+
         cancellable.cancel()
         await ProxyTestContainer4.clear()
     }

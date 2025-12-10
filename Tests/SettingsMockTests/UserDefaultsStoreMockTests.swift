@@ -1,16 +1,18 @@
 import Foundation
-import Testing
 import Settings
 import SettingsMock
+import Testing
 
 struct UserDefaultsStoreMockTests {
-    
+
     protocol ConstString {
         static var value: String { get }
     }
 
     struct TestContainer<Prefix: ConstString>: __Settings_Container {
-        static var store: any UserDefaultsStore { UserDefaultsStoreMock.standard }
+        static var store: any UserDefaultsStore {
+            UserDefaultsStoreMock.standard
+        }
         static var prefix: String { Prefix.value }
 
         static func clear() {
@@ -26,14 +28,13 @@ struct UserDefaultsStoreMockTests {
         }
     }
 
-
     @Test("Defaults vs values precedence and removal restores default")
     func defaultsAndValuesPrecedence() async throws {
         let store = UserDefaultsStoreMock(store: [:])
         let key = "name"
 
         // Register a default and read it
-        store.register(defaults: [key: "def"]) 
+        store.register(defaults: [key: "def"])
         #expect(store.string(forKey: key) == "def")
         #expect(store.object(forKey: key) as? String == "def")
 
@@ -77,7 +78,7 @@ struct UserDefaultsStoreMockTests {
         let token = store.observer(forKey: key) { old, new in
             nonisolated(unsafe) let _old: Any? = old
             nonisolated(unsafe) let _new: Any? = new
-            
+
             MainActor.assumeIsolated {
                 events.append(Event(old: _old, new: _new))
             }
@@ -87,7 +88,7 @@ struct UserDefaultsStoreMockTests {
         await Task.yield()
 
         // Register a default; expect a change from nil -> "d"
-        store.register(defaults: [key: "d"]) 
+        store.register(defaults: [key: "d"])
         #expect(events.count >= 2)
         // Last event should reflect the change to default
         if let last = events.last {
@@ -116,15 +117,16 @@ struct UserDefaultsStoreMockTests {
             #expect((last.old as? String) == "v1")
             #expect((last.new as? String) == "d")
         }
-        _ = token // keep alive
+        _ = token  // keep alive
     }
-    
+
     @Test func testBool() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testBool_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testBool_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Bool
@@ -132,10 +134,10 @@ struct UserDefaultsStoreMockTests {
             static let defaultValue = false
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         #expect(Attr.Encoder.self == Never.self)
         #expect(Attr.Decoder.self == Never.self)
-        
+
         let obj = try Attr.encode(true)
         #expect((obj as? Attr.Value) == true)
         let value = try Attr.decode(from: obj)

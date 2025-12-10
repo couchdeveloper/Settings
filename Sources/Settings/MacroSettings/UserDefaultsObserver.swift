@@ -44,7 +44,10 @@ final class UserDefaultsObserver: NSObject, Cancellable, @unchecked Sendable {
         change: [NSKeyValueChangeKey: Any]?,
         context: UnsafeMutableRawPointer?
     ) {
-        assert(keyPath == key, "KVO notification received for unexpected keyPath: \(keyPath ?? "nil"), expected: \(key)")
+        assert(
+            keyPath == key,
+            "KVO notification received for unexpected keyPath: \(keyPath ?? "nil"), expected: \(key)"
+        )
         callback(keyPath, change?[.oldKey], change?[.newKey])
     }
 

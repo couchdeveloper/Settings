@@ -52,7 +52,7 @@
 ///     @Settings struct Settings {
 ///         @Setting var hasSeenOnboarding = false
 ///     }
-///     
+///
 ///     var settings = Settings()
 /// }
 ///
@@ -60,7 +60,10 @@
 /// ```
 @attached(
     member,
-    names: named(Config), named(_config), named(store), named(prefix)
+    names: named(Config),
+    named(_config),
+    named(store),
+    named(prefix)
 )
 @attached(
     extension,
@@ -69,7 +72,8 @@
 public macro Settings(
     prefix: String? = nil,
     suiteName: String? = nil
-) = #externalMacro(
-    module: "SettingsMacros",
-    type: "SettingsMacro"
-)
+) =
+    #externalMacro(
+        module: "SettingsMacros",
+        type: "SettingsMacro"
+    )
