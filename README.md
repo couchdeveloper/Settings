@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/⚙️-Settings-blue?color=4A90E2" alt="Settings Framework"/>
   </a>
   <a href="https://swift.org">
-    <img src="https://img.shields.io/badge/Swift-6.1-orange.svg" alt="Swift 6.1"/>
+    <img src="https://img.shields.io/badge/Swift-6.2-orange.svg" alt="Swift 6.2"/>
   </a>
   <a href="https://swift.org">
     <img src="https://img.shields.io/badge/Platforms-iOS%20%7C%20macOS%20%7C%20tvOS%20%7C%20watchOS-brightgreen.svg" alt="Platforms"/>
