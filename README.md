@@ -31,23 +31,6 @@
 
 Type-safe, macro-powered Swift package for `UserDefaults`.
 
-## Installation
-
-### Swift Package Manager
-
-Add Settings to your `Package.swift`:
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/couchdeveloper/Settings.git", from: "0.4.0")
-]
-```
-
-Or in Xcode:
-1. File → Add Package Dependencies
-2. Enter: `https://github.com/couchdeveloper/Settings.git`
-3. Select version: 0.4.0 or later
-
 ## Features
 
 - **Type-safe** — Compile-time type checking with generated keys
@@ -89,7 +72,7 @@ import SettingsMock
 
 #Preview {
     AppSettingsView()
-        .environment(\.userDefaultsStore, UserDefaultsStoreMock())
+        .environment(\.userDefaultsStore, UserDefaultsStoreMock.standard)
 }
 #endif
 ```
@@ -213,11 +196,19 @@ struct Settings {
 
 ### Swift Package Manager
 
+Add Settings to your `Package.swift`:
+
 ```swift
 dependencies: [
     .package(url: "https://github.com/couchdeveloper/Settings.git", from: "0.4.0")
 ]
 ```
+
+Or in Xcode:
+1. File → Add Package Dependencies
+2. Enter: `https://github.com/couchdeveloper/Settings.git`
+3. Select version: 0.4.0 or later
+
 
 ## Advanced
 
