@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-12-11
+
+### Added
+- Standalone `@Setting` support: can now be used without `@Settings` macro on containers
+- Type-safe container resolution via `__ContainerResolver<Base>` with conditional conformance
+- Automatic fallback to `UserDefaults.standard` for containers without `@Settings`
+- Enhanced `@Settings` macro now generates full infrastructure (Config struct, thread-safe locking, dynamic properties)
+- Improved qualified name generation for nested containers (e.g., `"Profile::setting"`)
+
+### Changed
+- **FEAT**: `AppSettingValues.store` setter is now public (was `internal(set)`)
+- **FEAT**: `@Settings` macro generates different internal structure using Config-based approach
+- Added public types: `__ContainerResolver`, `__Settings_Container_Config`, `__UserDefaultsStandard`
+
+### Migration Guide
+No code changes required. Existing code continues to work unchanged. Simply rebuild against the new version.
+
 ## [0.4.0] - 2025-12-10
 
 ### Changed
