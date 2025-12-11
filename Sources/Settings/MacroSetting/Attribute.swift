@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 public protocol __Attribute<Container>: SendableMetatype {
-    associatedtype Container: __Settings_Container
+    associatedtype Container // : __Settings_Container
     associatedtype Value
 
     static var name: String { get }
@@ -24,7 +24,7 @@ public protocol __Attribute<Container>: SendableMetatype {
     where Subject: Equatable, Subject: Sendable
 }
 
-extension __Attribute {
+extension __Attribute where Container: __Settings_Container{
 
     public static var key: String { "\(Container.prefix)\(name)" }
 

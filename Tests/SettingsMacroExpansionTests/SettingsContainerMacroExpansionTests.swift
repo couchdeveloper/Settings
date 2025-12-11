@@ -22,7 +22,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -31,7 +31,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -68,7 +68,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -77,7 +77,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -114,7 +114,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -123,7 +123,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -160,7 +160,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "app_")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -169,7 +169,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -206,7 +206,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "com_myapp_")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -215,7 +215,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -252,7 +252,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -261,7 +261,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -298,7 +298,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "app_")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -307,7 +307,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -346,7 +346,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "app_")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -355,7 +355,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -392,7 +392,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "config_")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -401,7 +401,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -438,7 +438,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "actor_")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -447,7 +447,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -537,7 +537,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "app_")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -546,7 +546,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -625,7 +625,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "settings_")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -634,7 +634,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -713,7 +713,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "game_")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -722,7 +722,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }
@@ -763,7 +763,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         __Settings_Container_Config(prefix: "existing_")
                     }
 
-                    public internal(set) static var store: any UserDefaultsStore {
+                    public static var store: any UserDefaultsStore {
                         get {
                             state.store
                         }
@@ -772,7 +772,7 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                         }
                     }
 
-                    public internal(set) static var prefix: String {
+                    public static var prefix: String {
                         get {
                             state.prefix
                         }

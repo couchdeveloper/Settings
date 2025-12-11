@@ -10,18 +10,21 @@
 /// ## Attributes
 /// - `prefix: String?` — Optional key prefix that is applied to all generated keys.
 /// - `suiteName: String?` — Optional suite name used to create a `UserDefaults` instance via `UserDefaults(suiteName:)`.
-///   If `nil`, the standard defaults are used.
+///   If `nil`, `UserDefaults.standard` is used.
 ///
 /// ## Members
 /// - Within the container, declare properties using the `@Setting` member macro to bind keys and default values.
 /// - You can also add `@Setting` members from extensions of the same container.
 ///
 /// ## Example
-/// A simple container with one `@Setting` property. This example also demonstrates
-/// the `prefix` and `suiteName` parameters on `@Settings`.
+/// A UserDefaults container with one `@Setting` property. The UserDefaults container defines
+/// a `prefix`parameter - which will be prepended to all keys, and a `suiteName` parameter
+/// which defines the suite name for the custom UserDefaults instance.
+///  on `@Settings`.
 ///
 /// ```swift
 /// import Foundation
+/// import Settings
 ///
 /// @Settings(
 ///     prefix: "app_",
@@ -32,8 +35,13 @@
 ///     @Setting(key: "hasSeenOnboarding", default: false)
 ///     static var hasSeenOnboarding: Bool
 /// }
+/// ```
+///  >Note: A UserDefaults container using the macro `@Settings` can be declared at top level of any
+///  file. For better ergonomics, declare setting values as *static* members. Make the container public so
+///  that it is visible in other modules.
 ///
-/// // Usage
+/// ## Usage
+/// ```swift
 /// // Read
 /// let seen = AppSettings.hasSeenOnboarding
 ///
@@ -55,9 +63,12 @@
 ///
 ///     var settings = Settings()
 /// }
-///
-/// // SwiftUI views automatically update when settings.hasSeenOnboarding changes
 /// ```
+/// SwiftUI views automatically update when settings.hasSeenOnboarding changes
+///
+///  >Note: A UserDefaults container using the macro `@Settings` can be declared within classes or
+///  structs.
+
 @attached(
     member,
     names: named(Config),

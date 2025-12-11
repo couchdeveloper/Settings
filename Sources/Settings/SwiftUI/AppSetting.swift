@@ -58,7 +58,7 @@
             initialState: Config()
         )
 
-        public internal(set) static var store: any UserDefaultsStore {
+        public static var store: any UserDefaultsStore {
             get {
                 _config.withLock { config in
                     config.store

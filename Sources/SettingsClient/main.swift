@@ -3,7 +3,6 @@ import Foundation
 import Observation
 import Settings
 import SettingsMock
-import os
 
 // MARK: - App
 
@@ -140,6 +139,13 @@ final class ViewModel {
 }
 
 try await main1()
+
+// Standalone Setting
+enum MyStandardUserDefaults {
+    enum MyModule {
+        @Setting static var count: Int = 0
+    }
+}
 
 extension AppSettingValues {
     @Setting var user: String?

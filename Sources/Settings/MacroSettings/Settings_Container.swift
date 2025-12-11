@@ -58,7 +58,6 @@ extension __Settings_Container {
             attribute.write(value: newValue)
         }
     }
-    
 }
 
 extension __Settings_Container {
@@ -198,4 +197,9 @@ public struct __Settings_Container_Config: Sendable {
             }
         }
     }
+}
+
+public struct __UserDefaultsStandard: __Settings_Container {
+    public static var store: any UserDefaultsStore { UserDefaults.standard }
+    public static var prefix: String { "" }
 }

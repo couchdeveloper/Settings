@@ -1,4 +1,3 @@
-import Foundation
 import SwiftCompilerPlugin
 import SwiftSyntax
 import SwiftSyntaxBuilder
@@ -9,9 +8,6 @@ public struct SettingsMacro {}
 extension SettingsMacro: MemberMacro {
 
     // Implementation of the `@Settings` container macro
-    //
-    // This macro generates the configuration infrastructure for a container type.
-    // The container must manually conform to `__Settings_Container`.
     public static func expansion(
         of node: AttributeSyntax,
         providingMembersOf decl: some DeclGroupSyntax,
@@ -27,18 +23,20 @@ extension SettingsMacro: MemberMacro {
         let literalPrefix = initialPrefix == nil ? "" : initialPrefix!
 
         let stateDecl: DeclSyntax = """
-        private static var state: __Settings_Container_Config { __Settings_Container_Config(prefix: "\(raw: literalPrefix)") }
+        private static var state: __Settings_Container_Config { 
+            __Settings_Container_Config(prefix: "\(raw: literalPrefix)") 
+        }
         """
 
         let storeDecl: DeclSyntax = """
-        public internal(set) static var store: any UserDefaultsStore {
+        public static var store: any UserDefaultsStore {
             get { state.store }
             set { state.store = newValue }
         }
         """
 
         let prefixDecl: DeclSyntax = """
-        public internal(set) static var prefix: String {
+        public static var prefix: String {
             get { state.prefix }
             set { state.prefix = newValue }
         }
