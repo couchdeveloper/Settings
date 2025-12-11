@@ -215,14 +215,14 @@ Add Settings to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/couchdeveloper/Settings.git", from: "0.4.0")
+    .package(url: "https://github.com/couchdeveloper/Settings.git", from: "0.5.0")
 ]
 ```
 
 Or in Xcode:
 1. File → Add Package Dependencies
 2. Enter: `https://github.com/couchdeveloper/Settings.git`
-3. Select version: 0.4.0 or later
+3. Select version: 0.5.0 or later
 
 
 ## Advanced
