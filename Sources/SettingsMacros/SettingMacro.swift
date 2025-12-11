@@ -1,4 +1,3 @@
-import Foundation
 import SwiftCompilerPlugin
 import SwiftDiagnostics
 import SwiftSyntax
@@ -20,7 +19,7 @@ public struct SettingMacro: AccessorMacro, PeerMacro {
     // MARK: - AccessorMacro Implementation
 
     // Add getter and setter to the declaration
-    
+
     public static func expansion(
         of node: SwiftSyntax.AttributeSyntax,
         providingAccessorsOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
@@ -139,7 +138,7 @@ public struct SettingMacro: AccessorMacro, PeerMacro {
             of: node,
             for: varDecl,
             propertyName: userDefaultPropertyName,
-            prefix: containerAttributes.prefix,
+            prefix: containerAttributes.prefix ?? "",
             in: context
         )
 
@@ -187,7 +186,9 @@ public struct SettingMacro: AccessorMacro, PeerMacro {
                     ),
                     typeAnnotation: TypeAnnotationSyntax(
                         type: IdentifierTypeSyntax(
-                            name: .identifier("__AttributeProxy<\(attributeTypeName)>")
+                            name: .identifier(
+                                "__AttributeProxy<\(attributeTypeName)>"
+                            )
                         )
                     ),
                     accessorBlock: AccessorBlockSyntax(
@@ -224,15 +225,19 @@ extension SettingMacro {
         var members: [MemberBlockItemSyntax] = []
         members.append(makeContainerTypealias(containerType: containerTypeName))
         members.append(makeValueTypealias(valueType: valueTypeName))
-        
+
         // For Optional types, add explicit Wrapped typealias
-        if valueTypeName.isOptional, let wrappedTypealias = makeWrappedTypealias(valueType: valueTypeName) {
+        if valueTypeName.isOptional,
+            let wrappedTypealias = makeWrappedTypealias(
+                valueType: valueTypeName
+            )
+        {
             members.append(wrappedTypealias)
         }
-        
+
         // Add key pr
         members.append(makeNameProperty(attributeQualifiedName: qualifiedName))
-        
+
         if !valueTypeName.isOptional {
             if let defaultProp = makeDefaultValueProperty(
                 valueType: valueTypeName,
@@ -243,15 +248,20 @@ extension SettingMacro {
             }
         }
 
-        members.append(contentsOf: makeEncoderProperties(providerDirective: encodingProviderDirective))
-        
+        members.append(
+            contentsOf: makeEncoderProperties(
+                providerDirective: encodingProviderDirective
+            )
+        )
+
         return EnumDeclSyntax(
             modifiers: [DeclModifierSyntax(name: .keyword(.public))],
             name: .identifier(attributeTypeName),
             inheritanceClause: InheritanceClauseSyntax {
                 InheritedTypeSyntax(
                     type: IdentifierTypeSyntax(
-                        name: valueTypeName.isOptional ? "__AttributeOptional" : "__AttributeNonOptional"
+                        name: valueTypeName.isOptional
+                            ? "__AttributeOptional" : "__AttributeNonOptional"
                     )
                 )
             },
@@ -260,24 +270,31 @@ extension SettingMacro {
             )
         )
     }
-    
-    /// Creates the `typealias Container = <ContainerType>` member for the attribute enum.
-    private static func makeContainerTypealias(containerType: String) -> MemberBlockItemSyntax {
-        MemberBlockItemSyntax(
+
+    /// Creates the `typealias Container = __ContainerResolver<BaseType>` member for the attribute enum.
+    /// This uses conditional conformance to select either the base container (if it conforms to __Settings_Container)
+    /// or provides a default implementation with UserDefaults.standard.
+    private static func makeContainerTypealias(containerType: String)
+        -> MemberBlockItemSyntax
+    {
+        // Generate: typealias Container = __ContainerResolver<BaseType>
+        let containerResolverType = "__ContainerResolver<\(containerType)>"
+        
+        return MemberBlockItemSyntax(
             decl: TypeAliasDeclSyntax(
                 modifiers: [DeclModifierSyntax(name: .keyword(.public))],
                 name: "Container",
                 initializer: TypeInitializerClauseSyntax(
-                    value: IdentifierTypeSyntax(
-                        name: .identifier(containerType)
-                    )
+                    value: TypeSyntax(stringLiteral: containerResolverType)
                 )
             )
         )
     }
-    
+
     /// Creates the `typealias Value = <ValueType>` member for the attribute enum.
-    private static func makeValueTypealias(valueType: ParsedValueType) -> MemberBlockItemSyntax {
+    private static func makeValueTypealias(valueType: ParsedValueType)
+        -> MemberBlockItemSyntax
+    {
         MemberBlockItemSyntax(
             decl: TypeAliasDeclSyntax(
                 modifiers: [DeclModifierSyntax(name: .keyword(.public))],
@@ -290,12 +307,14 @@ extension SettingMacro {
             )
         )
     }
-    
+
     /// Creates the `typealias Wrapped = <UnwrappedType>` member for Optional value types.
     /// This is required because extensions have explicit `Wrapped == T` constraints for `Value == Optional<T>`.
-    private static func makeWrappedTypealias(valueType: ParsedValueType) -> MemberBlockItemSyntax? {
+    private static func makeWrappedTypealias(valueType: ParsedValueType)
+        -> MemberBlockItemSyntax?
+    {
         guard valueType.isOptional else { return nil }
-        
+
         // Extract the unwrapped type from the Optional
         let unwrappedTypeName: String
         if let syntax = valueType.syntax {
@@ -304,18 +323,22 @@ extension SettingMacro {
                 // Handle "T?" syntax
                 unwrappedTypeName = optionalType.wrappedType.trimmedDescription
             } else if let identifierType = syntax.as(IdentifierTypeSyntax.self),
-                      let genericArgs = identifierType.genericArgumentClause?.arguments.first {
+                let genericArgs = identifierType.genericArgumentClause?
+                    .arguments.first
+            {
                 // Handle "Optional<T>" or "Swift.Optional<T>" syntax
                 unwrappedTypeName = genericArgs.argument.trimmedDescription
             } else {
                 // Fallback to string parsing
-                unwrappedTypeName = extractUnwrappedTypeFromString(valueType.name)
+                unwrappedTypeName = extractUnwrappedTypeFromString(
+                    valueType.name
+                )
             }
         } else {
             // No AST available, use string parsing
             unwrappedTypeName = extractUnwrappedTypeFromString(valueType.name)
         }
-        
+
         return MemberBlockItemSyntax(
             decl: TypeAliasDeclSyntax(
                 modifiers: [DeclModifierSyntax(name: .keyword(.public))],
@@ -328,36 +351,43 @@ extension SettingMacro {
             )
         )
     }
-    
+
     /// Extracts the unwrapped type name from an Optional type string.
     /// "String?" -> "String", "Optional<String>" -> "String", "Swift.Optional<Int>" -> "Int"
-    private static func extractUnwrappedTypeFromString(_ typeName: String) -> String {
+    private static func extractUnwrappedTypeFromString(_ typeName: String)
+        -> String
+    {
         if typeName.hasSuffix("?") {
             // Handle "T?" syntax
             return String(typeName.dropLast())
         } else if typeName.contains("<") && typeName.hasSuffix(">") {
             // Handle "Optional<T>" or "Swift.Optional<T>" syntax
             if let startIndex = typeName.firstIndex(of: "<"),
-               let endIndex = typeName.lastIndex(of: ">") {
-                let innerType = typeName[typeName.index(after: startIndex)..<endIndex]
+                let endIndex = typeName.lastIndex(of: ">")
+            {
+                let innerType = typeName[
+                    typeName.index(after: startIndex)..<endIndex
+                ]
                 return String(innerType)
             }
         }
         // Fallback: return as-is (shouldn't happen for valid Optional types)
         return typeName
     }
-        
+
     /// Creates the `static let name = "..."` property which is used to compose a
     /// UserDefaults key.
     /// The `name` stored property returs the qualified name of the Attribute, not inlcuding the prefix
     /// of the container. The `key` property is a computed property which returns:
     /// `Container.prefix + name`.
-    private static func makeNameProperty(attributeQualifiedName: String) -> MemberBlockItemSyntax {
+    private static func makeNameProperty(attributeQualifiedName: String)
+        -> MemberBlockItemSyntax
+    {
         MemberBlockItemSyntax(
             decl: VariableDeclSyntax(
                 modifiers: [
                     DeclModifierSyntax(name: .keyword(.public)),
-                    DeclModifierSyntax(name: .keyword(.static))
+                    DeclModifierSyntax(name: .keyword(.static)),
                 ],
                 bindingSpecifier: .keyword(.let),
                 bindings: PatternBindingListSyntax([
@@ -375,7 +405,7 @@ extension SettingMacro {
             )
         )
     }
-    
+
     /// Creates the optional `static var defaultValue: Value { ... }` property if a default is specified.
     /// Returns nil if no default value is provided.
     private static func makeDefaultValueProperty(
@@ -389,7 +419,7 @@ extension SettingMacro {
             decl: VariableDeclSyntax(
                 modifiers: [
                     DeclModifierSyntax(name: .keyword(.public)),
-                    DeclModifierSyntax(name: .keyword(.static))
+                    DeclModifierSyntax(name: .keyword(.static)),
                 ],
                 bindingSpecifier: .keyword(.let),
                 bindings: PatternBindingListSyntax([
@@ -410,14 +440,15 @@ extension SettingMacro {
             )
         )
     }
-    
+
     /// Creates the `static let defaultRegistrar = __DefaultRegistrar()` member used to register defaults at load time.
-    private static func makeDefaultRegistrarProperty() -> MemberBlockItemSyntax {
+    private static func makeDefaultRegistrarProperty() -> MemberBlockItemSyntax
+    {
         MemberBlockItemSyntax(
             decl: VariableDeclSyntax(
                 modifiers: [
                     DeclModifierSyntax(name: .keyword(.public)),
-                    DeclModifierSyntax(name: .keyword(.static))
+                    DeclModifierSyntax(name: .keyword(.static)),
                 ],
                 bindingSpecifier: .keyword(.let),
                 bindings: PatternBindingListSyntax([
@@ -426,14 +457,16 @@ extension SettingMacro {
                             identifier: .identifier("defaultRegistrar")
                         ),
                         initializer: InitializerClauseSyntax(
-                            value: ExprSyntax(stringLiteral: "__DefaultRegistrar()")
+                            value: ExprSyntax(
+                                stringLiteral: "__DefaultRegistrar()"
+                            )
                         )
                     )
                 ])
             )
         )
     }
-    
+
     /// Creates encoder/decoder properties based on the encoding directive (strategy or custom).
     /// Returns empty array for property-list types that don't need custom encoding.
     private static func makeEncoderProperties(
@@ -451,7 +484,7 @@ extension SettingMacro {
                     name: "decoder",
                     typeDescription: "some AttributeDecoding",
                     expression: decoderExpr
-                )
+                ),
             ]
         case .strategy(let strategy):
             return [
@@ -464,13 +497,13 @@ extension SettingMacro {
                     name: "decoder",
                     typeDescription: "some AttributeDecoding",
                     expression: strategy.decoderExpression
-                )
+                ),
             ]
         case .none:
             return []
         }
     }
-    
+
     /// Creates a single encoder or decoder property member with the specified name and value expression.
     private static func makeCoderProperty(
         name: String,
@@ -481,7 +514,7 @@ extension SettingMacro {
             decl: VariableDeclSyntax(
                 modifiers: [
                     DeclModifierSyntax(name: .keyword(.public)),
-                    DeclModifierSyntax(name: .keyword(.static))
+                    DeclModifierSyntax(name: .keyword(.static)),
                 ],
                 bindingSpecifier: .keyword(.var),
                 bindings: PatternBindingListSyntax([
@@ -827,8 +860,11 @@ extension SettingMacro {
         // Walk up the container type hierarchy and find the first type
         // which is a store Container (aka `__Settings_Container`)
         var topContainer: String = ""
+        var inExtension = false
+        
         for contextNode in context.lexicalContext {
             if let extensionDecl = contextNode.as(ExtensionDeclSyntax.self) {
+                inExtension = true
                 let fullTypeName = extensionDecl.extendedType.description
                     .trimmingCharacters(in: .whitespacesAndNewlines)
                 topContainer =
@@ -841,38 +877,47 @@ extension SettingMacro {
                 }
             }
             if let structDecl = contextNode.as(StructDeclSyntax.self) {
-                topContainer = structDecl.name.text
+                if topContainer.isEmpty {
+                    topContainer = structDecl.name.text
+                }
                 if isAnnotatedWithUserDefaultsMacro(structDecl.attributes) {
-                    return topContainer
+                    return structDecl.name.text
                 }
             }
             if let classDecl = contextNode.as(ClassDeclSyntax.self) {
-                topContainer = classDecl.name.text
+                if topContainer.isEmpty {
+                    topContainer = classDecl.name.text
+                }
                 if isAnnotatedWithUserDefaultsMacro(classDecl.attributes) {
-                    return topContainer
+                    return classDecl.name.text
                 }
             }
             if let enumDecl = contextNode.as(EnumDeclSyntax.self) {
-                topContainer = enumDecl.name.text
+                if topContainer.isEmpty {
+                    topContainer = enumDecl.name.text
+                }
                 if isAnnotatedWithUserDefaultsMacro(enumDecl.attributes) {
-                    return topContainer
+                    return enumDecl.name.text
                 }
             }
             if let actorDecl = contextNode.as(ActorDeclSyntax.self) {
-                topContainer = actorDecl.name.text
+                if topContainer.isEmpty {
+                    topContainer = actorDecl.name.text
+                }
                 if isAnnotatedWithUserDefaultsMacro(actorDecl.attributes) {
-                    return topContainer
+                    return actorDecl.name.text
                 }
             }
         }
 
-        // If no Container found, use the root container, and make the
-        // assumption it is_a `__Settings_Container`. If it is not,
-        // the compiler will emit an error.
-        guard !topContainer.isEmpty else {
-            throw MacroError.noContainerFound
+        // If we're in an extension or found a top container name, return it
+        // The type system will resolve whether it's a __Settings_Container via __ContainerResolver
+        if !topContainer.isEmpty {
+            return topContainer
         }
-        return topContainer
+
+        // No container found at all - this shouldn't happen in valid Swift code
+        throw MacroError.noContainerFound
     }
 
     /// Returns the containers attributes.
@@ -978,7 +1023,7 @@ extension SettingMacro {
             }
             return nil
         }
-        
+
         let keyName = extractCustomKeyName(from: node)
         if let keyName {
             return keyName
@@ -1091,7 +1136,7 @@ extension SettingMacro {
     ) throws -> String {
         // For nested types, include the namespace hierarchy in the name
         // e.g., AppSettings.UserSettings -> "UserSettings::setting"
-        
+
         // Helper function to check if attributes contain @Settings macro
         func isAnnotatedWithUserDefaultsMacro(
             _ attributes: SwiftSyntax.AttributeListSyntax
@@ -1109,12 +1154,12 @@ extension SettingMacro {
             }
             return false
         }
-        
+
         // Collect all nested type names and the extension info
         // Lexical context is traversed from innermost to outermost
         var nestedTypeNames: [String] = []
         var extensionTypeName: String? = nil
-        
+
         for contextNode in context.lexicalContext {
             // Check for nested type declarations (enum, struct, class)
             if let enumDecl = contextNode.as(EnumDeclSyntax.self) {
@@ -1122,43 +1167,58 @@ extension SettingMacro {
                 if !isAnnotatedWithUserDefaultsMacro(enumDecl.attributes) {
                     nestedTypeNames.append(enumDecl.name.text)
                 }
-            }
-            else if let structDecl = contextNode.as(StructDeclSyntax.self) {
+            } else if let structDecl = contextNode.as(StructDeclSyntax.self) {
                 // Only add if not annotated with @UserDefaults (not the container itself)
                 if !isAnnotatedWithUserDefaultsMacro(structDecl.attributes) {
                     nestedTypeNames.append(structDecl.name.text)
                 }
-            }
-            else if let classDecl = contextNode.as(ClassDeclSyntax.self) {
+            } else if let classDecl = contextNode.as(ClassDeclSyntax.self) {
                 // Only add if not annotated with @UserDefaults (not the container itself)
                 if !isAnnotatedWithUserDefaultsMacro(classDecl.attributes) {
                     nestedTypeNames.append(classDecl.name.text)
                 }
             }
             // Check for extension
-            else if let extensionDecl = contextNode.as(ExtensionDeclSyntax.self) {
+            else if let extensionDecl = contextNode.as(ExtensionDeclSyntax.self)
+            {
                 extensionTypeName = extensionDecl.extendedType.description
                     .trimmingCharacters(in: .whitespacesAndNewlines)
                 // Once we find the extension, we can stop
                 break
             }
         }
-        
+
         // Determine the namespace based on what we found
         if let extendedType = extensionTypeName {
             // If extending a nested type (AppSettings.Profile), use the nested part
             if let dotIndex = extendedType.firstIndex(of: ".") {
-                let namespace = String(extendedType[extendedType.index(after: dotIndex)...])
+                let namespace = String(
+                    extendedType[extendedType.index(after: dotIndex)...]
+                )
                 return "\(namespace)::\(propertyName)"
             }
             // If we have nested types inside a simple extension, use those
             if !nestedTypeNames.isEmpty {
                 // Reverse because we collected from innermost to outermost
-                let namespace = nestedTypeNames.reversed().joined(separator: "::")
+                let namespace = nestedTypeNames.reversed().joined(
+                    separator: "::"
+                )
                 return "\(namespace)::\(propertyName)"
             }
+        } else {
+            // No extension, check if we have nested types (e.g., enum inside enum)
+            if !nestedTypeNames.isEmpty {
+                // Reverse because we collected from innermost to outermost
+                // Skip the outermost container (the one that would have @Settings)
+                let namespace = nestedTypeNames.dropLast().reversed().joined(
+                    separator: "::"
+                )
+                if !namespace.isEmpty {
+                    return "\(namespace)::\(propertyName)"
+                }
+            }
         }
-        
+
         // Default: just use the property name
         return propertyName
     }
@@ -1491,4 +1551,3 @@ extension StructDeclSyntax: _Conformable {
     }
     var _typeName: String { name.text }
 }
-

@@ -19,25 +19,31 @@ enum MacroError: Error, CustomStringConvertible {
         case .invalidDeclaration:
             return "@Setting can only be applied to variable declarations"
         case .noContainerFound:
-            return "@Setting must be declared within a type conforming to __Settings_Container"
+            return
+                "@Setting must be declared within a type conforming to __Settings_Container"
         case .cannotDetermineType:
-            return "Cannot determine the type of the property. Please provide a type annotation."
+            return
+                "Cannot determine the type of the property. Please provide a type annotation."
         case .missingInitialValue:
             return "Non-optional @Setting properties require an initial value"
         case .invalidInitialValue:
-            return "Optional @Setting properties should not have an initial value"
+            return
+                "Optional @Setting properties should not have an initial value"
         case .duplicateKeyName(let keyName):
-            return "Duplicate name name '\(keyName)' detected. Each name name should be unique within a store."
+            return
+                "Duplicate name name '\(keyName)' detected. Each name name should be unique within a store."
         case .invalidPrefix(let message):
             return message
 
         case .invalidEnclosingContainerDecl(let decl):
-            return "A @Setting declaration cannot reside inside a \(decl) declaration."
+            return
+                "A @Setting declaration cannot reside inside a \(decl) declaration."
 
         case .invalidEnclosingContainer(let what):
             return "A @Setting declaration cannot reside inside a \(what)."
         case .invalidContainerType:
-            return "@Settings can only be applied to struct, class, enum, or actor declarations"
+            return
+                "@Settings can only be applied to struct, class, enum, or actor declarations"
         }
     }
 }

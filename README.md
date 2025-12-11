@@ -66,7 +66,11 @@ struct AppSettingsView: View {
         }
     }
 }
+```
 
+Use the `UserDefaultsStoreMock` class in Previews:
+
+```swift
 #if DEBUG
 import SettingsMock
 
@@ -76,6 +80,8 @@ import SettingsMock
 }
 #endif
 ```
+
+> Note: `AppSettingValues` is a mockable UserDefaults container already declared in the Settings library.
 
 ## Set a global key prefix:
 
@@ -99,19 +105,24 @@ struct MyApp: App {
 
 ## Custom Settings Container
 
-```swift
-import Settings
+You do not need to put the user settings into a type annotated with the `@Settings` macro. You also can declare or use any regular struct, class or enum as your UserDefaults container: 
 
+```swift 
+struct AppSettings {
+    @Setting static var username: String = "Guest"
+}
+```
+This will store and read from the setting in Foundation's `UserDefaults.standard`.
+
+If you require more control, like having key prefixes, using your own UserDefaults suite, or if you want to mock Foundation UserDefaults in Previews or elsewhere, use the `@Settings` macro:
+
+```swift
 @Settings(prefix: "app_") // keys prefixed with "app_"
 struct AppSettings {
     @Setting static var username: String = "Guest"
-    @Setting(name: "colorScheme") static var theme: String = "light" // key = "colorScheme"
-    @Setting static var apiKey: String? // optional: no default
 }
-
-AppSettings.username = "Alice"
-print(AppSettings.theme) // "light"
 ```
+
 
 ## Projected Value ($propertyName)
 
@@ -165,14 +176,18 @@ Settings.apiKey = nil // removes key from UserDefaults
 
 ## Nested Containers
 
+Support keys within a name space:
+
 ```swift
+struct AppSettings {}
+
 extension AppSettings { enum UserSettings {} }
 
 extension AppSettings.UserSettings {
     @Setting static var email: String?
 }
 
-print(AppSettings.UserSettings.$email.key) // "app_UserSettings::email"
+print(AppSettings.UserSettings.$email.key) // "UserSettings::email"
 AppSettings.UserSettings.email = "alice@example.com"
 ```
 

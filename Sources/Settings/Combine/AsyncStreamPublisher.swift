@@ -12,7 +12,8 @@ import Combine
 ///   (convenient for UI consumers). If you prefer the loop off-main and only
 ///   hop to the main actor for delivery, consider modifying the Task to call
 ///   `await MainActor.run { ... }` for each delivery instead.
-struct AsyncStreamPublisher<S>: Publisher where S: AsyncSequence & Sendable, S.Element: Sendable {
+struct AsyncStreamPublisher<S>: Publisher
+where S: AsyncSequence & Sendable, S.Element: Sendable {
     typealias Output = S.Element
     typealias Failure = Swift.Error
 
@@ -22,14 +23,15 @@ struct AsyncStreamPublisher<S>: Publisher where S: AsyncSequence & Sendable, S.E
         self.sequence = sequence
     }
 
-    func receive<Sink: Subscriber>(subscriber: Sink) where Sink.Input == Output, Sink.Failure == Failure {
+    func receive<Sink: Subscriber>(subscriber: Sink)
+    where Sink.Input == Output, Sink.Failure == Failure {
         let erased = AnySubscriber<Output, Failure>(subscriber)
         let subscription = Subscription(sequence: sequence, downstream: erased)
         subscriber.receive(subscription: subscription)
     }
 }
 
-extension  AsyncStreamPublisher {
+extension AsyncStreamPublisher {
 
     // Subscription assumptions / environment
     // - This publisher observes infrequently-changing sources (UserDefaults), so
@@ -73,7 +75,9 @@ extension  AsyncStreamPublisher {
         // @Sendable closure does not capture a generic subscriber metatype.
         private struct DownstreamBox: @unchecked Sendable {
             let downstream: AnySubscriber<Output, Failure>
-            init(_ downstream: AnySubscriber<Output, Failure>) { self.downstream = downstream }
+            init(_ downstream: AnySubscriber<Output, Failure>) {
+                self.downstream = downstream
+            }
         }
 
         private var task: Task<Void, Swift.Error>?
@@ -86,22 +90,22 @@ extension  AsyncStreamPublisher {
                 do {
                     for try await value in sequence {
                         try Task.checkCancellation()
-                        _ = downstreamBox.downstream.receive(value) // ignore returned demand for now
+                        _ = downstreamBox.downstream.receive(value)  // ignore returned demand for now
                     }
-                    
+
                     // natural completion -> send finished
                     downstreamBox.downstream.receive(completion: .finished)
-                }
-                catch is CancellationError {
+                } catch is CancellationError {
                     // we should reach here only, when the cancel function
                     // has been called – which cancels the task.
                     /* nothing */
-                }
-                catch {
+                } catch {
                     // We reach here, when the stream has been forcibly terminated
                     // or the `do` above threw another error. So, `downstream`
                     // should be intact.
-                    downstreamBox.downstream.receive(completion: .failure(error))
+                    downstreamBox.downstream.receive(
+                        completion: .failure(error)
+                    )
                 }
             }
         }

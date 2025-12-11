@@ -1,9 +1,10 @@
-import SettingsMacros
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
 import XCTest
 
-final class SettingMacroExpansionTests: XCTestCase {
+import SettingsMacros
+
+final class SettingsSettingMacroExpansionTests: XCTestCase {
     struct Case {
         init(type: String, initializer: String, description: String) {
             self.type = type
@@ -30,7 +31,7 @@ final class SettingMacroExpansionTests: XCTestCase {
     func testBool00() throws {
         #if canImport(SettingsMacros)
             let input = """
-                struct AppSettings {
+                @Settings struct AppSettings {
                     @Setting var setting: Bool = true
                 }
                 """
@@ -57,6 +58,101 @@ final class SettingMacroExpansionTests: XCTestCase {
                     public var $setting: __AttributeProxy<__Attribute_AppSettings_setting> {
                         return __AttributeProxy(attributeType: __Attribute_AppSettings_setting.self)
                     }
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
+
+                extension AppSettings: __Settings_Container {
+                }
+                """
+
+            assertMacroExpansion(
+                input,
+                expandedSource: expected,
+                macros: testMacros
+            )
+        #else
+            throw XCTSkip(
+                "macros are only supported when running tests for the host platform"
+            )
+        #endif
+    }
+
+    func testBool10() throws {
+        #if canImport(SettingsMacros)
+            let input = """
+                @Settings(prefix: "app_") struct AppSettings {
+                    @Setting var setting: Bool = true
+                }
+                """
+
+            let expected = """
+                struct AppSettings {
+                    var setting: Bool {
+                        get {
+                            return __Attribute_AppSettings_setting.read()
+                        }
+                        set {
+                            __Attribute_AppSettings_setting.write(value: newValue)
+                        }
+                    }
+
+                    public enum __Attribute_AppSettings_setting: __AttributeNonOptional {
+                        public typealias Container = __ContainerResolver<AppSettings>
+                        public typealias Value = Bool
+                        public static let name = "setting"
+                        public static let defaultValue: Bool = true
+                        public static let defaultRegistrar = __DefaultRegistrar()
+                    }
+
+                    public var $setting: __AttributeProxy<__Attribute_AppSettings_setting> {
+                        return __AttributeProxy(attributeType: __Attribute_AppSettings_setting.self)
+                    }
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
+
+                extension AppSettings: __Settings_Container {
                 }
                 """
 
@@ -75,7 +171,7 @@ final class SettingMacroExpansionTests: XCTestCase {
     func testBool01() throws {
         #if canImport(SettingsMacros)
             let input = """
-                struct AppSettings {}
+                @Settings struct AppSettings {}
 
                 extension AppSettings {
                     @Setting var setting: Bool = true
@@ -83,7 +179,30 @@ final class SettingMacroExpansionTests: XCTestCase {
                 """
 
             let expected = """
-                struct AppSettings {}
+                struct AppSettings {
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
 
                 extension AppSettings {
                     var setting: Bool {
@@ -107,6 +226,9 @@ final class SettingMacroExpansionTests: XCTestCase {
                         return __AttributeProxy(attributeType: __Attribute_AppSettings_setting.self)
                     }
                 }
+
+                extension AppSettings: __Settings_Container {
+                }
                 """
 
             assertMacroExpansion(
@@ -121,40 +243,66 @@ final class SettingMacroExpansionTests: XCTestCase {
         #endif
     }
 
-    func testNested01() throws {
+    func testBool11() throws {
         #if canImport(SettingsMacros)
             let input = """
-                enum AppSettings {
-                    enum Profile {
-                        @Setting static var setting: Bool = true
-                    }
+                @Settings(prefix: "app_") struct AppSettings {}
+
+                extension AppSettings {
+                    @Setting var setting: Bool = true
                 }
                 """
 
             let expected = """
-                enum AppSettings {
-                    enum Profile {
-                        static var setting: Bool {
-                            get {
-                                return __Attribute_AppSettings_Profile_setting.read()
-                            }
-                            set {
-                                __Attribute_AppSettings_Profile_setting.write(value: newValue)
-                            }
-                        }
+                struct AppSettings {
 
-                        public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                            public typealias Container = __ContainerResolver<AppSettings>
-                            public typealias Value = Bool
-                            public static let name = "Profile::setting"
-                            public static let defaultValue: Bool = true
-                            public static let defaultRegistrar = __DefaultRegistrar()
-                        }
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
+                    }
 
-                        public static var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
-                            return __AttributeProxy(attributeType: __Attribute_AppSettings_Profile_setting.self)
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
                         }
                     }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
+
+                extension AppSettings {
+                    var setting: Bool {
+                        get {
+                            return __Attribute_AppSettings_setting.read()
+                        }
+                        set {
+                            __Attribute_AppSettings_setting.write(value: newValue)
+                        }
+                    }
+
+                    public enum __Attribute_AppSettings_setting: __AttributeNonOptional {
+                        public typealias Container = __ContainerResolver<AppSettings>
+                        public typealias Value = Bool
+                        public static let name = "setting"
+                        public static let defaultValue: Bool = true
+                        public static let defaultRegistrar = __DefaultRegistrar()
+                    }
+
+                    public var $setting: __AttributeProxy<__Attribute_AppSettings_setting> {
+                        return __AttributeProxy(attributeType: __Attribute_AppSettings_setting.self)
+                    }
+                }
+
+                extension AppSettings: __Settings_Container {
                 }
                 """
 
@@ -173,23 +321,46 @@ final class SettingMacroExpansionTests: XCTestCase {
     func testNestedBool00() throws {
         #if canImport(SettingsMacros)
             let input = """
-                enum AppSettings {}
+                @Settings struct AppSettings {}
 
                 extension AppSettings { enum Profile {} }
 
                 extension AppSettings.Profile {
-                    @Setting static var setting: Bool = true
+                    @Setting var setting: Bool = true
                 }
                 """
 
             let expected = """
-                enum AppSettings {}
+                struct AppSettings {
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
 
                 extension AppSettings { enum Profile {} 
                 }
 
                 extension AppSettings.Profile {
-                    static var setting: Bool {
+                    var setting: Bool {
                         get {
                             return __Attribute_AppSettings_Profile_setting.read()
                         }
@@ -206,9 +377,12 @@ final class SettingMacroExpansionTests: XCTestCase {
                         public static let defaultRegistrar = __DefaultRegistrar()
                     }
 
-                    public static var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
+                    public var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
                         return __AttributeProxy(attributeType: __Attribute_AppSettings_Profile_setting.self)
                     }
+                }
+
+                extension AppSettings: __Settings_Container {
                 }
                 """
 
@@ -227,7 +401,7 @@ final class SettingMacroExpansionTests: XCTestCase {
     func testNestedBool10() throws {
         #if canImport(SettingsMacros)
             let input = """
-                struct AppSettings {}
+                @Settings(prefix: "app_") struct AppSettings {}
 
                 extension AppSettings { enum Profile {} }
 
@@ -237,7 +411,30 @@ final class SettingMacroExpansionTests: XCTestCase {
                 """
 
             let expected = """
-                struct AppSettings {}
+                struct AppSettings {
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
 
                 extension AppSettings { enum Profile {} 
                 }
@@ -264,6 +461,9 @@ final class SettingMacroExpansionTests: XCTestCase {
                         return __AttributeProxy(attributeType: __Attribute_AppSettings_Profile_setting.self)
                     }
                 }
+
+                extension AppSettings: __Settings_Container {
+                }
                 """
 
             assertMacroExpansion(
@@ -281,7 +481,7 @@ final class SettingMacroExpansionTests: XCTestCase {
     func testNestedBool01() throws {
         #if canImport(SettingsMacros)
             let input = """
-                struct AppSettings { enum Profile {} }
+                @Settings struct AppSettings { enum Profile {} }
 
                 extension AppSettings.Profile {
                     @Setting var setting: Bool = true
@@ -290,6 +490,28 @@ final class SettingMacroExpansionTests: XCTestCase {
 
             let expected = """
                 struct AppSettings { enum Profile {} 
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
                 }
 
                 extension AppSettings.Profile {
@@ -314,6 +536,84 @@ final class SettingMacroExpansionTests: XCTestCase {
                         return __AttributeProxy(attributeType: __Attribute_AppSettings_Profile_setting.self)
                     }
                 }
+
+                extension AppSettings: __Settings_Container {
+                }
+                """
+
+            assertMacroExpansion(
+                input,
+                expandedSource: expected,
+                macros: testMacros
+            )
+        #else
+            throw XCTSkip(
+                "macros are only supported when running tests for the host platform"
+            )
+        #endif
+    }
+
+    func testNestedBool11() throws {
+        #if canImport(SettingsMacros)
+            let input = """
+                @Settings(prefix: "app_") struct AppSettings { enum Profile {} }
+
+                extension AppSettings.Profile {
+                    @Setting var setting: Bool = true
+                }
+                """
+
+            let expected = """
+                struct AppSettings { enum Profile {} 
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
+
+                extension AppSettings.Profile {
+                    var setting: Bool {
+                        get {
+                            return __Attribute_AppSettings_Profile_setting.read()
+                        }
+                        set {
+                            __Attribute_AppSettings_Profile_setting.write(value: newValue)
+                        }
+                    }
+
+                    public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
+                        public typealias Container = __ContainerResolver<AppSettings>
+                        public typealias Value = Bool
+                        public static let name = "Profile::setting"
+                        public static let defaultValue: Bool = true
+                        public static let defaultRegistrar = __DefaultRegistrar()
+                    }
+
+                    public var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
+                        return __AttributeProxy(attributeType: __Attribute_AppSettings_Profile_setting.self)
+                    }
+                }
+
+                extension AppSettings: __Settings_Container {
+                }
                 """
 
             assertMacroExpansion(
@@ -331,7 +631,7 @@ final class SettingMacroExpansionTests: XCTestCase {
     func testNestedBool02() throws {
         #if canImport(SettingsMacros)
             let input = """
-                struct AppSettings {}
+                @Settings struct AppSettings {}
 
                 extension AppSettings { enum Profile {
                     @Setting var setting: Bool = true
@@ -339,7 +639,30 @@ final class SettingMacroExpansionTests: XCTestCase {
                 """
 
             let expected = """
-                struct AppSettings {}
+                struct AppSettings {
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
 
                 extension AppSettings { enum Profile {
                     var setting: Bool {
@@ -364,6 +687,9 @@ final class SettingMacroExpansionTests: XCTestCase {
                     }
                 } 
                 }
+
+                extension AppSettings: __Settings_Container {
+                }
                 """
 
             assertMacroExpansion(
@@ -378,6 +704,82 @@ final class SettingMacroExpansionTests: XCTestCase {
         #endif
     }
 
+    func testNestedBool12() throws {
+        #if canImport(SettingsMacros)
+            let input = """
+                @Settings(prefix: "app_") struct AppSettings {}
+
+                extension AppSettings { enum Profile {
+                    @Setting var setting: Bool = true
+                } }
+                """
+
+            let expected = """
+                struct AppSettings {
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
+
+                extension AppSettings { enum Profile {
+                    var setting: Bool {
+                        get {
+                            return __Attribute_AppSettings_Profile_setting.read()
+                        }
+                        set {
+                            __Attribute_AppSettings_Profile_setting.write(value: newValue)
+                        }
+                    }
+
+                    public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
+                        public typealias Container = __ContainerResolver<AppSettings>
+                        public typealias Value = Bool
+                        public static let name = "Profile::setting"
+                        public static let defaultValue: Bool = true
+                        public static let defaultRegistrar = __DefaultRegistrar()
+                    }
+
+                    public var $setting: __AttributeProxy<__Attribute_AppSettings_Profile_setting> {
+                        return __AttributeProxy(attributeType: __Attribute_AppSettings_Profile_setting.self)
+                    }
+                } 
+                }
+
+                extension AppSettings: __Settings_Container {
+                }
+                """
+
+            assertMacroExpansion(
+                input,
+                expandedSource: expected,
+                macros: testMacros
+            )
+        #else
+            throw XCTSkip(
+                "macros are only supported when running tests for the host platform"
+            )
+        #endif
+    }
+    
     func testAllPropertyListTypes() throws {
         #if canImport(SettingsMacros)
             let allCases: [Case] = [
@@ -492,7 +894,7 @@ final class SettingMacroExpansionTests: XCTestCase {
         #if canImport(SettingsMacros)
 
             let input = """
-                struct AppSettings {}
+                @Settings struct AppSettings {}
                 extension AppSettings { enum UserSettings {} }
 
                 extension AppSettings.UserSettings {
@@ -501,7 +903,30 @@ final class SettingMacroExpansionTests: XCTestCase {
                 """
 
             let expected = """
-                struct AppSettings {}
+                struct AppSettings {
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
                 extension AppSettings { enum UserSettings {} 
                 }
 
@@ -527,6 +952,9 @@ final class SettingMacroExpansionTests: XCTestCase {
                         return __AttributeProxy(attributeType: __Attribute_AppSettings_UserSettings_setting.self)
                     }
                 }
+
+                extension AppSettings: __Settings_Container {
+                }
                 """
 
             assertMacroExpansion(
@@ -544,14 +972,37 @@ final class SettingMacroExpansionTests: XCTestCase {
     func testNestedContainer2() throws {
         #if canImport(SettingsMacros)
             let input = """
-                struct AppSettings {}
+                @Settings struct AppSettings {}
                 extension AppSettings { enum UserSettings {
                     @Setting var setting: String = "default"
                 } }
                 """
 
             let expected = """
-                struct AppSettings {}
+                struct AppSettings {
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
                 extension AppSettings { enum UserSettings {
                     var setting: String {
                         get {
@@ -574,6 +1025,9 @@ final class SettingMacroExpansionTests: XCTestCase {
                         return __AttributeProxy(attributeType: __Attribute_AppSettings_UserSettings_setting.self)
                     }
                 } 
+                }
+
+                extension AppSettings: __Settings_Container {
                 }
                 """
 
@@ -637,14 +1091,14 @@ final class SettingMacroExpansionTests: XCTestCase {
     }
 }
 
-extension SettingMacroExpansionTests {
+extension SettingsSettingMacroExpansionTests {
 
     private struct TestCase {
         let description: String
         var containerQualifiedName: String
         let valueType: String
         var initialValue: String = ""
-        var settingMacroAttributes: String = ""
+        var macroAttributes: String = ""
         var isStatic: Bool = false
 
         var isOptional: Bool {
@@ -678,10 +1132,10 @@ extension SettingMacroExpansionTests {
 
         let template: String =
             """
-            struct \(containerBaseName) {}\
+            @Settings struct \(containerBaseName)\(testCase.macroAttributes) {}\
             \(nestedContainerDecl, indentation: 0)
             extension \(testCase.containerQualifiedName) {
-                @Setting\(testCase.settingMacroAttributes) \(staticModifier)var setting: \(testCase.valueType)\(initializer)
+                @Setting\(testCase.macroAttributes) \(staticModifier)var setting: \(testCase.valueType)\(initializer)
             }
             """
         return template
@@ -781,8 +1235,64 @@ extension SettingMacroExpansionTests {
                 }
             """
 
+        // Extract prefix from test case macro attributes
+        let prefixValue: String
+        if testCase.macroAttributes.contains("prefix:") {
+            // Extract the prefix value from macro attributes
+            if let match = testCase.macroAttributes.range(
+                of: #"prefix: "([^"]*)"#,
+                options: .regularExpression
+            ) {
+                let prefixMatch = testCase.macroAttributes[match]
+                if let valueStart = prefixMatch.range(of: "\"") {
+                    let afterQuote = prefixMatch[valueStart.upperBound...]
+                    if let endQuote = afterQuote.firstIndex(of: "\"") {
+                        prefixValue = String(afterQuote[..<endQuote])
+                    } else {
+                        prefixValue = ""
+                    }
+                } else {
+                    prefixValue = ""
+                }
+            } else {
+                prefixValue = ""
+            }
+        } else {
+            prefixValue = ""
+        }
+
+        // Config infrastructure - always add to the base container (AppSettings)
+        // The @Settings macro is on the base container, so Config goes there
+        let configInfrastructure: String
+        configInfrastructure = """
+
+
+                private static var state: __Settings_Container_Config {
+                    __Settings_Container_Config(prefix: "\(prefixValue)")
+                }
+
+                public static var store: any UserDefaultsStore {
+                    get {
+                        state.store
+                    }
+                    set {
+                        state.store = newValue
+                    }
+                }
+
+                public static var prefix: String {
+                    get {
+                        state.prefix
+                    }
+                    set {
+                        state.prefix = newValue
+                    }
+                }
+            """
+
         let template = """
-            struct \(containerBaseName) {}
+            struct \(containerBaseName) {\(configInfrastructure)
+            }
             \(nestedContainerDecl, indentation: 0, prependNewLine: false)\
             extension \(testCase.containerQualifiedName) {
                 \(staticModifier)var setting: \(testCase.valueType) {
@@ -795,7 +1305,7 @@ extension SettingMacroExpansionTests {
                 }
 
                 public enum \(enumName): \(testCase.protocolName) {
-                    public typealias Container = __ContainerResolver<AppSettings>
+                    public typealias Container = \(containerBaseName)
                     public typealias Value = \(testCase.valueType)\
             \(testCase.wrappedDecl, indentation: 8)
                     public static let name = "\(name)"\
@@ -805,29 +1315,32 @@ extension SettingMacroExpansionTests {
                 }
             \(proxyAccessor, indentation: 0, prependNewLine: false)
             }
+
+            extension \(containerBaseName): __Settings_Container {
+            }
             """
         return template
     }
 }
 
-// extension String.StringInterpolation {
-//     mutating func appendInterpolation(
-//         _ value: String,
-//         indentation: Int,
-//         prependNewLine: Bool = true
-//     ) {
-//         guard !value.isEmpty else {
-//             return
-//         }
-//         let spaces = String(repeating: " ", count: indentation)
-//         if prependNewLine {
-//             appendLiteral("\n")
-//         }
-//         appendLiteral(spaces)
-//         let string = value.split(
-//             separator: "\n",
-//             omittingEmptySubsequences: false
-//         ).joined(separator: "\n" + spaces)
-//         appendLiteral(string)
-//     }
-// }
+extension String.StringInterpolation {
+    mutating func appendInterpolation(
+        _ value: String,
+        indentation: Int,
+        prependNewLine: Bool = true
+    ) {
+        guard !value.isEmpty else {
+            return
+        }
+        let spaces = String(repeating: " ", count: indentation)
+        if prependNewLine {
+            appendLiteral("\n")
+        }
+        appendLiteral(spaces)
+        let string = value.split(
+            separator: "\n",
+            omittingEmptySubsequences: false
+        ).joined(separator: "\n" + spaces)
+        appendLiteral(string)
+    }
+}

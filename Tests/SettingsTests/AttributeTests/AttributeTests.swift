@@ -1,10 +1,10 @@
-import Testing
+import Combine
 import Foundation
 import Settings
-import Combine
+import Testing
 
 struct AttributeTests {
-    
+
     protocol ConstString {
         static var value: String { get }
     }
@@ -12,7 +12,7 @@ struct AttributeTests {
     struct TestContainer<Prefix: ConstString>: __Settings_Container {
         static var store: any UserDefaultsStore { UserDefaults.standard }
         static var prefix: String { Prefix.value }
-        
+
         static func clear() {
             for key in keys {
                 store.removeObject(forKey: key)
@@ -21,19 +21,23 @@ struct AttributeTests {
         static var allKeys: [String] {
             Array(store.dictionaryRepresentation().keys)
         }
-        
+
         static var keys: [String] {
-            Array(store.dictionaryRepresentation().keys).filter { $0.hasPrefix(prefix) }
+            Array(store.dictionaryRepresentation().keys).filter {
+                $0.hasPrefix(prefix)
+            }
         }
     }
 
-
     @Test("Key composition - prefix + name")
     func testKeyComposition() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_key_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_key_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = String
@@ -41,27 +45,30 @@ struct AttributeTests {
             static let defaultValue = "default"
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         // Write a value via the typed API
         C[Attr.self] = "value"
-        
+
         // Expected full key is container prefix + attribute name
         let expectedFullKey = C.prefix + Attr.name
-        
+
         // Assert the underlying store has exactly that full key, and not the bare name
         #expect(C.allKeys.contains(expectedFullKey))
         #expect(!C.allKeys.contains(Attr.name))
-        
+
         // Read directly from the store to verify composition
         #expect(C.store.string(forKey: expectedFullKey) == "value")
-        
+
         // Sanity: typed read still returns the written value
         #expect(C[Attr.self] == "value")
     }
-    
+
     @Test("Bool - Non-Optional")
     func testBoolNonOptional() async throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_bool_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_bool_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
 
@@ -81,10 +88,13 @@ struct AttributeTests {
 
     @Test("Int - Non-Optional")
     func testIntNonOptional() async throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_int_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_int_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Int
@@ -101,10 +111,13 @@ struct AttributeTests {
 
     @Test("Float - Non-Optional")
     func testFloatNonOptional() async throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_float_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_float_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Float
@@ -121,10 +134,13 @@ struct AttributeTests {
 
     @Test("Double - Non-Optional")
     func testDoubleNonOptional() async throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_double_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_double_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Double
@@ -141,11 +157,15 @@ struct AttributeTests {
 
     @Test("String - Non-Optional")
     func testStringNonOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_string_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_string_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
-        enum Attr: __AttributeNonOptional { typealias Container = C
+
+        enum Attr: __AttributeNonOptional {
+            typealias Container = C
             typealias Value = String
             static let name = "nonOptional"
             static let defaultValue = "default"
@@ -162,17 +182,20 @@ struct AttributeTests {
 
     @Test("URL - Non-Optional")
     func testURLNonOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_url_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_url_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
-    enum Attr: __AttributeNonOptional {
-        typealias Container = C
-        typealias Value = URL
-        static let name = "nonOptional"
-        static let defaultValue = URL(string: "https://example.com")!
-        static let defaultRegistrar = __DefaultRegistrar()
-    }
+
+        enum Attr: __AttributeNonOptional {
+            typealias Container = C
+            typealias Value = URL
+            static let name = "nonOptional"
+            static let defaultValue = URL(string: "https://example.com")!
+            static let defaultRegistrar = __DefaultRegistrar()
+        }
         #expect(C[Attr.self].absoluteString == "https://example.com")
         let newURL = URL(string: "https://apple.com")!
         C[Attr.self] = newURL
@@ -183,10 +206,13 @@ struct AttributeTests {
 
     @Test("Date - Non-Optional")
     func testDateNonOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_date_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_date_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Date
@@ -197,17 +223,23 @@ struct AttributeTests {
         #expect(C[Attr.self].timeIntervalSince1970 == 123456)
         let now = Date()
         C[Attr.self] = now
-        #expect(abs(C[Attr.self].timeIntervalSince1970 - now.timeIntervalSince1970) < 0.05)
+        #expect(
+            abs(C[Attr.self].timeIntervalSince1970 - now.timeIntervalSince1970)
+                < 0.05
+        )
         Attr.reset()
         #expect(C[Attr.self].timeIntervalSince1970 == 123456)
     }
 
     @Test("Data - Non-Optional")
     func testDataNonOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_data_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_data_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Data
@@ -227,17 +259,20 @@ struct AttributeTests {
 
     @Test("Bool? - Optional including coercion")
     func testBoolOptionalAndCoercion() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_boolOpt_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_boolOpt_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Bool?
             typealias Wrapped = Bool
             static let name = "optional"
         }
-        
+
         #expect(C[Attr.self] == nil)
         C[Attr.self] = true
         #expect(C[Attr.self] == true)
@@ -261,10 +296,13 @@ struct AttributeTests {
 
     @Test("Int? - Optional")
     func testIntOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_intOpt_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_intOpt_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Int?
@@ -280,10 +318,13 @@ struct AttributeTests {
 
     @Test("Float? - Optional")
     func testFloatOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_floatOpt_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_floatOpt_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Float?
@@ -299,10 +340,13 @@ struct AttributeTests {
 
     @Test("Double? - Optional")
     func testDoubleOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_doubleOpt_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_doubleOpt_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Double?
@@ -318,10 +362,13 @@ struct AttributeTests {
 
     @Test("String? - Optional")
     func testStringOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_stringOpt_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_stringOpt_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum StringOpt: __AttributeOptional {
             typealias Container = C
             typealias Value = String?
@@ -339,10 +386,13 @@ struct AttributeTests {
 
     @Test("URL? - Optional")
     func testURLOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_urlOpt_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_urlOpt_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = URL?
@@ -359,10 +409,13 @@ struct AttributeTests {
 
     @Test("Date? - Optional")
     func testDateOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_dateOpt_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_dateOpt_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Date?
@@ -372,17 +425,25 @@ struct AttributeTests {
         #expect(C[Attr.self] == nil)
         let d = Date()
         C[Attr.self] = d
-        #expect(abs((C[Attr.self] ?? .distantPast).timeIntervalSince1970 - d.timeIntervalSince1970) < 0.05)
+        #expect(
+            abs(
+                (C[Attr.self] ?? .distantPast).timeIntervalSince1970
+                    - d.timeIntervalSince1970
+            ) < 0.05
+        )
         C[Attr.self] = nil
         #expect(C[Attr.self] == nil)
     }
 
     @Test("Data? - Optional")
     func testDataOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_dataOpt_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_dataOpt_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Data?
@@ -401,10 +462,13 @@ struct AttributeTests {
 
     @Test("Array Codable - Non-Optional")
     func testArrayCodableNonOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_arrayCodable_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_arrayCodable_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = [String]
@@ -421,10 +485,13 @@ struct AttributeTests {
 
     @Test("Dictionary Codable - Optional")
     func testDictionaryCodableOptional() throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_dictCodableOpt_" }
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_dictCodableOpt_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = [String: Int]?
@@ -441,8 +508,12 @@ struct AttributeTests {
     }
 
     @Test("CustomCodable default registration encodes into store")
-    func testCustomCodableDefaultRegistrationStoresEncodedDefault() async throws {
-        enum Prefix: ConstString { static let value = "com_UserDefaultsTests_UserDefaultAttributeTests_customCodableDefault_" }
+    func testCustomCodableDefaultRegistrationStoresEncodedDefault() async throws
+    {
+        enum Prefix: ConstString {
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeTests_customCodableDefault_"
+        }
         typealias C = TestContainer<Prefix>
         defer { C.clear() }
 

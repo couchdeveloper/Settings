@@ -1,18 +1,24 @@
-import Testing
-import Observation
 import Dispatch
+import Foundation
+import Observation
 import Settings
+import Testing
 import Utilities
+import os
 
 @MainActor
-final class Observer<Observable: Observation.Observable>: Sendable where Observable: Sendable {
+final class Observer<Observable: Observation.Observable>: Sendable
+where Observable: Sendable {
     let observable: Observable
-    
+
     init(observable: Observable) {
         self.observable = observable
     }
-    
-    func observe<Subject>(_ keyPath: KeyPath<Observable, Subject>, action: @escaping @Sendable (Subject) -> Void ) {
+
+    func observe<Subject>(
+        _ keyPath: KeyPath<Observable, Subject>,
+        action: @escaping @Sendable (Subject) -> Void
+    ) {
         nonisolated(unsafe) let capturedKeyPath = keyPath
         withObservationTracking {
             action(observable[keyPath: capturedKeyPath])
@@ -25,12 +31,12 @@ final class Observer<Observable: Observation.Observable>: Sendable where Observa
     }
 }
 
-
 struct UserDefaultsWithObservationTests {
-    
-    @Settings(prefix: "UserDefaultsWithObservationTests_Settings_") struct AppSettings {
+
+    @Settings(prefix: "UserDefaultsWithObservationTests_Settings_")
+    struct AppSettings {
         @Setting var hasSeenOnboarding = false
-        
+
         static func clear() {
             store.dictionaryRepresentation().keys
                 .filter { $0.hasPrefix(self.prefix) }
@@ -51,9 +57,9 @@ struct UserDefaultsWithObservationTests {
 
         let viewModel = ViewModel()
         let observer = Observer(observable: viewModel)
-        
+
         #expect(viewModel.settings.hasSeenOnboarding == false)
-        
+
         let expectationInitial = Utilities.Expectation()
         let expectationSet = Utilities.Expectation()
 
@@ -66,14 +72,14 @@ struct UserDefaultsWithObservationTests {
                 expectationSet.fulfill()
             }
         }
-        
+
         viewModel.settings.hasSeenOnboarding = true
-        
+
         try await expectationInitial.await()
         try await expectationSet.await()
         #expect(viewModel.settings.hasSeenOnboarding == true)
         viewModel.settings.$hasSeenOnboarding.reset()
-        
+
         AppSettings.clear()
     }
 

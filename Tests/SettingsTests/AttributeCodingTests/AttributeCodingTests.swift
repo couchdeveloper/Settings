@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 import Settings
+import Testing
 
 struct AttributeCodingTests {
 
@@ -30,10 +30,11 @@ struct AttributeCodingTests {
 extension AttributeCodingTests {
     @Test func testBool() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testBool_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testBool_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Bool
@@ -41,45 +42,47 @@ extension AttributeCodingTests {
             static let defaultValue = false
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         #expect(Attr.Encoder.self == Never.self)
         #expect(Attr.Decoder.self == Never.self)
-        
+
         let obj = try Attr.encode(true)
         #expect((obj as? Attr.Value) == true)
         let value = try Attr.decode(from: obj)
         #expect(value == true)
     }
-    
+
     @Test func testOptionalBool() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalBool_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalBool_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Bool?
             typealias Wrapped = Bool
             static let name = "boolOpt"
         }
-        
+
         #expect(Attr.Wrapped.self == Bool.self)
         #expect(Attr.Encoder.self == Never.self)
         #expect(Attr.Decoder.self == Never.self)
-        
+
         let obj = try Attr.encode(true)
         #expect((obj as? Attr.Value) == true)
         let value = try Attr.decode(from: obj)
         #expect(value == true)
     }
-    
+
     @Test func testInt() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testInt_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testInt_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Int
@@ -87,40 +90,42 @@ extension AttributeCodingTests {
             static let defaultValue = -1
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         let obj = try Attr.encode(7)
         #expect((obj as? Attr.Value) == 7)
         let value = try Attr.decode(from: obj)
         #expect(value == 7)
     }
-    
+
     @Test func testOptionalInt() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalInt_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalInt_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Int?
             typealias Wrapped = Int
             static let name = "intOpt"
         }
-        
+
         #expect(Attr.Wrapped.self == Int.self)
-        
+
         let obj = try Attr.encode(7)
         #expect((obj as? Attr.Value) == 7)
         let value = try Attr.decode(from: obj)
         #expect(value == 7)
     }
-    
+
     @Test func testFloat() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testFloat_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testFloat_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Float
@@ -128,40 +133,42 @@ extension AttributeCodingTests {
             static let defaultValue: Float = 0
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         let obj = try Attr.encode(3.5)
         #expect((obj as? Attr.Value) == 3.5)
         let value = try Attr.decode(from: obj)
         #expect(value == 3.5)
     }
-    
+
     @Test func testOptionalFloat() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalFloat_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalFloat_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Float?
             typealias Wrapped = Float
             static let name = "floatOpt"
         }
-        
+
         #expect(Attr.Wrapped.self == Float.self)
-        
+
         let obj = try Attr.encode(3.5)
         #expect((obj as? Attr.Value) == 3.5)
         let value = try Attr.decode(from: obj)
         #expect(value == 3.5)
     }
-    
+
     @Test func testDouble() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testDouble_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testDouble_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Double
@@ -169,40 +176,42 @@ extension AttributeCodingTests {
             static let defaultValue: Double = 0
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         let obj = try Attr.encode(7.25)
         #expect((obj as? Attr.Value) == 7.25)
         let value = try Attr.decode(from: obj)
         #expect(value == 7.25)
     }
-    
+
     @Test func testOptionalDouble() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalDouble_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalDouble_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Double?
             typealias Wrapped = Double
             static let name = "doubleOpt"
         }
-        
+
         #expect(Attr.Wrapped.self == Double.self)
-        
+
         let obj = try Attr.encode(7.25)
         #expect((obj as? Attr.Value) == 7.25)
         let value = try Attr.decode(from: obj)
         #expect(value == 7.25)
     }
-    
+
     @Test func testString() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testString_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testString_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = String
@@ -210,40 +219,42 @@ extension AttributeCodingTests {
             static let defaultValue: String = ""
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         let obj = try Attr.encode("hello")
         #expect((obj as? Attr.Value) == "hello")
         let value = try Attr.decode(from: obj)
         #expect(value == "hello")
     }
-    
+
     @Test func testOptionalString() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalString_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalString_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = String?
             typealias Wrapped = String
             static let name = "stringOpt"
         }
-        
+
         #expect(Attr.Wrapped.self == String.self)
-        
+
         let obj = try Attr.encode("hello")
         #expect((obj as? Attr.Value) == "hello")
         let value = try Attr.decode(from: obj)
         #expect(value == "hello")
     }
-    
+
     @Test func testDate() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testDate_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testDate_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Date
@@ -251,40 +262,42 @@ extension AttributeCodingTests {
             static let defaultValue = Date(timeIntervalSince1970: 0)
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         let sample = Date(timeIntervalSince1970: 1_234_567)
         let obj = try Attr.encode(sample)
         #expect((obj as? Attr.Value) == sample)
         let value = try Attr.decode(from: obj)
         #expect(value == sample)
     }
-    
+
     @Test func testOptionalDate() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalDate_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalDate_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Date?
             typealias Wrapped = Date
             static let name = "dateOpt"
         }
-        
+
         let sample = Date(timeIntervalSince1970: 1_234_567)
         let obj = try Attr.encode(sample)
         #expect((obj as? Attr.Value) == sample)
         let value = try Attr.decode(from: obj)
         #expect(value == sample)
     }
-    
+
     @Test func testData() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testData_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testData_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = Data
@@ -292,44 +305,46 @@ extension AttributeCodingTests {
             static let defaultValue = Data()
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         let sample = Data([0x01, 0x02, 0x03])
         let obj = try Attr.encode(sample)
         #expect((obj as? Attr.Value) == sample)
         let value = try Attr.decode(from: obj)
         #expect(value == sample)
     }
-    
+
     @Test func testOptionalData() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalData_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalData_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = Data?
             typealias Wrapped = Data
             static let name = "dataOpt"
         }
-        
+
         let sample = Data([0x01, 0x02, 0x03])
         let obj = try Attr.encode(sample)
         #expect((obj as? Attr.Value) == sample)
         let value = try Attr.decode(from: obj)
         #expect(value == sample)
     }
-    
+
 }
 
 // MARK: - Primitive URL
 extension AttributeCodingTests {
     @Test func testURL() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testURL_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testURL_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
             typealias Value = URL
@@ -337,31 +352,32 @@ extension AttributeCodingTests {
             static let defaultValue = URL(string: "https://example.com")!
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         let url = URL(string: "https://swift.org")!
         let encoded = try Attr.encode(url)
         let decoded = try Attr.decode(from: encoded)
-        
+
         #expect(decoded == url)
     }
-    
+
     @Test func testOptionalURL() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalURL_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalURL_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
             typealias Value = URL?
             typealias Wrapped = URL
             static let name = "urlOpt"
         }
-        
+
         let url = URL(string: "https://swift.org")!
         let encoded = try Attr.encode(url)
         let decoded = try Attr.decode(from: encoded)
-        
+
         #expect(decoded == url)
     }
 }
@@ -369,21 +385,22 @@ extension AttributeCodingTests {
 // MARK: - Primitive Array
 
 extension AttributeCodingTests {
-    
+
     @Test func testArrayAny() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testArrayAny_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testArrayAny_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
-            typealias Value = Array<Any>
+            typealias Value = [Any]
             static let name = "arrayAny"
             static var defaultValue: [Any] { [] }
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         let sample: [Any] = ["a", 1, true]
         let obj = try Attr.encode(sample)
         let encoded = obj as? Attr.Value
@@ -399,20 +416,21 @@ extension AttributeCodingTests {
         #expect((decoded[1] as? Int) == 1)
         #expect((decoded[2] as? Bool) == true)
     }
-    
+
     @Test func testOptionalArrayAny() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalArrayAny_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalArrayAny_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
-            typealias Value = Array<Any>?
-            typealias Wrapped = Array<Any>
+            typealias Value = [Any]?
+            typealias Wrapped = [Any]
             static let name = "arrayAnyOpt"
         }
-        
+
         let sample: [Any] = ["a", 1, true]
         let obj = try Attr.encode(sample)
         let encoded = obj as? Attr.Value
@@ -431,41 +449,43 @@ extension AttributeCodingTests {
         #expect((decodedArray[1] as? Int) == 1)
         #expect((decodedArray[2] as? Bool) == true)
     }
-    
+
     @Test func testArrayString() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testArrayString_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testArrayString_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeNonOptional {
             typealias Container = C
-            typealias Value = Array<String>
+            typealias Value = [String]
             static let name = "arrayString"
             static let defaultValue: [String] = []
             static let defaultRegistrar = __DefaultRegistrar()
         }
-        
+
         let sample = ["a", "b", "c"]
         let obj = try Attr.encode(sample)
         #expect((obj as? Attr.Value) == sample)
         let value = try Attr.decode(from: obj)
         #expect(value == sample)
     }
-    
+
     @Test func testOptionalArrayString() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalArrayString_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalArrayString_"
         }
         typealias C = TestContainer<Prefix>
-        
+
         enum Attr: __AttributeOptional {
             typealias Container = C
-            typealias Value = Array<String>?
-            typealias Wrapped = Array<String>
+            typealias Value = [String]?
+            typealias Wrapped = [String]
             static let name = "arrayStringOpt"
         }
-        
+
         let sample = ["a", "b", "c"]
         let obj = try Attr.encode(sample)
         #expect((obj as? Attr.Value) == sample)
@@ -480,13 +500,14 @@ extension AttributeCodingTests {
 
     @Test func testDictionaryAny() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testDictionaryAny_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testDictionaryAny_"
         }
         typealias C = TestContainer<Prefix>
 
         enum Attr: __AttributeNonOptional {
             typealias Container = C
-            typealias Value = Dictionary<String, Any>
+            typealias Value = [String: Any]
             static let name = "dictAny"
             static var defaultValue: [String: Any] { [:] }
             static let defaultRegistrar = __DefaultRegistrar()
@@ -495,7 +516,7 @@ extension AttributeCodingTests {
         let sample: [String: Any] = [
             "s": "str",
             "i": 1,
-            "b": true
+            "b": true,
         ]
         let obj = try Attr.encode(sample)
         let encoded = obj as? Attr.Value
@@ -512,21 +533,22 @@ extension AttributeCodingTests {
 
     @Test func testOptionalDictionaryAny() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalDictionaryAny_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalDictionaryAny_"
         }
         typealias C = TestContainer<Prefix>
 
         enum Attr: __AttributeOptional {
             typealias Container = C
-            typealias Value = Dictionary<String, Any>?
-            typealias Wrapped = Dictionary<String, Any>
+            typealias Value = [String: Any]?
+            typealias Wrapped = [String: Any]
             static let name = "dictAnyOpt"
         }
 
         let sample: [String: Any] = [
             "s": "str",
             "i": 1,
-            "b": true
+            "b": true,
         ]
         let obj = try Attr.encode(sample)
         let encoded = obj as? Attr.Value
@@ -546,13 +568,14 @@ extension AttributeCodingTests {
 
     @Test func testDictionaryString() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testDictionaryString_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testDictionaryString_"
         }
         typealias C = TestContainer<Prefix>
 
         enum Attr: __AttributeNonOptional {
             typealias Container = C
-            typealias Value = Dictionary<String, String>
+            typealias Value = [String: String]
             static let name = "dictString"
             static let defaultValue: [String: String] = [:]
             static let defaultRegistrar = __DefaultRegistrar()
@@ -567,14 +590,15 @@ extension AttributeCodingTests {
 
     @Test func testOptionalDictionaryString() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalDictionaryString_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalDictionaryString_"
         }
         typealias C = TestContainer<Prefix>
 
         enum Attr: __AttributeOptional {
             typealias Container = C
-            typealias Value = Dictionary<String, String>?
-            typealias Wrapped = Dictionary<String, String>
+            typealias Value = [String: String]?
+            typealias Wrapped = [String: String]
             static let name = "dictStringOpt"
         }
 
@@ -588,18 +612,19 @@ extension AttributeCodingTests {
 
 // MARK: Custom Codable Types
 extension AttributeCodingTests {
-    
+
     private struct CustomCodable: Codable, Equatable {
         let id: String
         let count: Int
         let flag: Bool
     }
-    
+
     // MARK: Coding: JSON
-    
+
     @Test func testCustomCodableJSON() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testCustomCodableJSON_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testCustomCodableJSON_"
         }
         typealias C = TestContainer<Prefix>
 
@@ -607,7 +632,11 @@ extension AttributeCodingTests {
             typealias Container = C
             typealias Value = CustomCodable
             static let name = "customJSON"
-            static let defaultValue = CustomCodable(id: "default", count: 0, flag: false)
+            static let defaultValue = CustomCodable(
+                id: "default",
+                count: 0,
+                flag: false
+            )
             static let defaultRegistrar = __DefaultRegistrar()
             static var encoder: JSONEncoder { JSONEncoder() }
             static var decoder: JSONDecoder { JSONDecoder() }
@@ -622,7 +651,8 @@ extension AttributeCodingTests {
 
     @Test func testOptionalCustomCodableJSON() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalCustomCodableJSON_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalCustomCodableJSON_"
         }
         typealias C = TestContainer<Prefix>
 
@@ -643,10 +673,11 @@ extension AttributeCodingTests {
     }
 
     // MARK: Coding: PropertyList
-    
+
     @Test func testCustomCodablePropertyList() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testCustomCodablePropertyList_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testCustomCodablePropertyList_"
         }
         typealias C = TestContainer<Prefix>
 
@@ -654,7 +685,11 @@ extension AttributeCodingTests {
             typealias Container = C
             typealias Value = CustomCodable
             static let name = "customPlist"
-            static let defaultValue = CustomCodable(id: "default", count: 0, flag: false)
+            static let defaultValue = CustomCodable(
+                id: "default",
+                count: 0,
+                flag: false
+            )
             static let defaultRegistrar = __DefaultRegistrar()
             static var encoder: PropertyListEncoder { PropertyListEncoder() }
             static var decoder: PropertyListDecoder { PropertyListDecoder() }
@@ -669,7 +704,8 @@ extension AttributeCodingTests {
 
     @Test func testOptionalCustomCodablePropertyList() async throws {
         enum Prefix: ConstString {
-            static let value = "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalCustomCodablePropertyList_"
+            static let value =
+                "com_UserDefaultsTests_UserDefaultAttributeCodingTests_testOptionalCustomCodablePropertyList_"
         }
         typealias C = TestContainer<Prefix>
 
@@ -690,4 +726,3 @@ extension AttributeCodingTests {
     }
 
 }
-

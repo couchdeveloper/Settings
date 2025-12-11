@@ -45,7 +45,8 @@ public final class Expectation: Sendable {
     public func await(
         nanoseconds: UInt64
     ) async throws {
-        try await withCheckedThrowingContinuation { (continuation: Continuation) in
+        try await withCheckedThrowingContinuation {
+            (continuation: Continuation) in
             self.lock.withLock { state in
                 switch state {
                 case .start(let minFulfillCount):
@@ -105,7 +106,8 @@ public final class Expectation: Sendable {
         tolerance: C.Instant.Duration? = nil,
         clock: C = ContinuousClock(),
     ) async throws {
-        try await withCheckedThrowingContinuation { (continuation: Continuation) in
+        try await withCheckedThrowingContinuation {
+            (continuation: Continuation) in
             self.lock.withLock { state in
                 switch state {
                 case .start(let minFulfillCount):
@@ -168,7 +170,8 @@ public final class Expectation: Sendable {
     }
 
     public func await() async throws {
-        try await withCheckedThrowingContinuation { (continuation: Continuation) in
+        try await withCheckedThrowingContinuation {
+            (continuation: Continuation) in
             self.lock.withLock { state in
                 switch state {
                 case .start(let minFulfillCount):
@@ -246,7 +249,12 @@ public final class Expectation: Sendable {
                     )
                 }
 
-            case .pending(let continuation, let minFulfillCount, let fulfillCount, let timeoutTask):
+            case .pending(
+                let continuation,
+                let minFulfillCount,
+                let fulfillCount,
+                let timeoutTask
+            ):
                 var newFulfillCount = fulfillCount + 1
                 if newFulfillCount >= minFulfillCount {
                     // fullfilled, we are going to resume the continuation
@@ -323,7 +331,11 @@ extension Expectation: CustomStringConvertible {
     public var description: String {
         enum State {
             case unitialized(fulfillCount: Int)
-            case pending(Continuation, fulfillCount: Int, timeoutTask: Task<Void, Swift.Error>?)
+            case pending(
+                Continuation,
+                fulfillCount: Int,
+                timeoutTask: Task<Void, Swift.Error>?
+            )
             case fulfilled
             case rejected(any Swift.Error)
         }
