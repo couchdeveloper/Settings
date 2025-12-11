@@ -147,6 +147,11 @@ enum MyStandardUserDefaults {
     }
 }
 
+enum F {
+    @Setting static var count: Int = 0
+}
+
+
 extension AppSettingValues {
     @Setting var user: String?
     @Setting var theme: String = "default"
