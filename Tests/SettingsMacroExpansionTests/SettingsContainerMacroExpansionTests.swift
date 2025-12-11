@@ -16,45 +16,34 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct DefaultSettings {
+                struct DefaultSettings {
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension DefaultSettings: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+
+                extension DefaultSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -73,45 +62,34 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct AppSettings {
+                struct AppSettings {
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension AppSettings: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+
+                extension AppSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -130,45 +108,34 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct MinimalSettings {
+                struct MinimalSettings {
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension MinimalSettings: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+                
+                extension MinimalSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -187,45 +154,34 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct AppSettings {
+                struct AppSettings {
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = "app_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension AppSettings: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+
+                extension AppSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -244,45 +200,34 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct AppSettings {
+                struct AppSettings {
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = "com_myapp_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "com_myapp_")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension AppSettings: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+
+                extension AppSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -301,45 +246,34 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct AppSettings {
+                struct AppSettings {
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension AppSettings: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+
+                extension AppSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -358,45 +292,34 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct AppSettings {
+                struct AppSettings {
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = "app_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension AppSettings: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+
+                extension AppSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -417,45 +340,34 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    class AppConfiguration {
+                class AppConfiguration {
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = "app_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension AppConfiguration: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+
+                extension AppConfiguration: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -474,45 +386,34 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    enum ConfigSettings {
+                enum ConfigSettings {
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = "config_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "config_")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension ConfigSettings: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+
+                extension ConfigSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -531,45 +432,34 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    actor ActorSettings {
+                actor ActorSettings {
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = "actor_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "actor_")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension ActorSettings: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+
+                extension ActorSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -621,65 +511,54 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct AppSettings {
-                        var username: String {
-                            get {
-                                return __Attribute_AppSettings_username.read()
-                            }
-                            set {
-                                __Attribute_AppSettings_username.write(value: newValue)
-                            }
+                struct AppSettings {
+                    var username: String {
+                        get {
+                            return __Attribute_AppSettings_username.read()
                         }
-
-                        public enum __Attribute_AppSettings_username: __AttributeNonOptional {
-                            public typealias Container = AppSettings
-                            public typealias Value = String
-                            public static let name = "username"
-                            public static let defaultValue: String = "anonymous"
-                            public static let defaultRegistrar = __DefaultRegistrar()
-                        }
-
-                        public var $username: __AttributeProxy<__Attribute_AppSettings_username> {
-                            return __AttributeProxy(attributeType: __Attribute_AppSettings_username.self)
-                        }
-
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = "app_"
-                        }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            __Attribute_AppSettings_username.write(value: newValue)
                         }
                     }
 
-                    extension AppSettings: __Settings_Container {
+                    public enum __Attribute_AppSettings_username: __AttributeNonOptional {
+                        public typealias Container = AppSettings
+                        public typealias Value = String
+                        public static let name = "username"
+                        public static let defaultValue: String = "anonymous"
+                        public static let defaultRegistrar = __DefaultRegistrar()
                     }
-                    """,
+
+                    public var $username: __AttributeProxy<__Attribute_AppSettings_username> {
+                        return __AttributeProxy(attributeType: __Attribute_AppSettings_username.self)
+                    }
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
+
+                extension AppSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -700,85 +579,74 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct UserPreferences {
-                        var username: String {
-                            get {
-                                return __Attribute_UserPreferences_username.read()
-                            }
-                            set {
-                                __Attribute_UserPreferences_username.write(value: newValue)
-                            }
+                struct UserPreferences {
+                    var username: String {
+                        get {
+                            return __Attribute_UserPreferences_username.read()
                         }
-
-                        public enum __Attribute_UserPreferences_username: __AttributeNonOptional {
-                            public typealias Container = UserPreferences
-                            public typealias Value = String
-                            public static let name = "user_name"
-                            public static let defaultValue: String = "guest"
-                            public static let defaultRegistrar = __DefaultRegistrar()
-                        }
-
-                        public var $username: __AttributeProxy<__Attribute_UserPreferences_username> {
-                            return __AttributeProxy(attributeType: __Attribute_UserPreferences_username.self)
-                        }
-                        var theme: String {
-                            get {
-                                return __Attribute_UserPreferences_theme.read()
-                            }
-                            set {
-                                __Attribute_UserPreferences_theme.write(value: newValue)
-                            }
-                        }
-
-                        public enum __Attribute_UserPreferences_theme: __AttributeNonOptional {
-                            public typealias Container = UserPreferences
-                            public typealias Value = String
-                            public static let name = "theme"
-                            public static let defaultValue: String = "light"
-                            public static let defaultRegistrar = __DefaultRegistrar()
-                        }
-
-                        public var $theme: __AttributeProxy<__Attribute_UserPreferences_theme> {
-                            return __AttributeProxy(attributeType: __Attribute_UserPreferences_theme.self)
-                        }
-
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = "settings_"
-                        }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            __Attribute_UserPreferences_username.write(value: newValue)
                         }
                     }
 
-                    extension UserPreferences: __Settings_Container {
+                    public enum __Attribute_UserPreferences_username: __AttributeNonOptional {
+                        public typealias Container = UserPreferences
+                        public typealias Value = String
+                        public static let name = "user_name"
+                        public static let defaultValue: String = "guest"
+                        public static let defaultRegistrar = __DefaultRegistrar()
                     }
-                    """,
+
+                    public var $username: __AttributeProxy<__Attribute_UserPreferences_username> {
+                        return __AttributeProxy(attributeType: __Attribute_UserPreferences_username.self)
+                    }
+                    var theme: String {
+                        get {
+                            return __Attribute_UserPreferences_theme.read()
+                        }
+                        set {
+                            __Attribute_UserPreferences_theme.write(value: newValue)
+                        }
+                    }
+
+                    public enum __Attribute_UserPreferences_theme: __AttributeNonOptional {
+                        public typealias Container = UserPreferences
+                        public typealias Value = String
+                        public static let name = "theme"
+                        public static let defaultValue: String = "light"
+                        public static let defaultRegistrar = __DefaultRegistrar()
+                    }
+
+                    public var $theme: __AttributeProxy<__Attribute_UserPreferences_theme> {
+                        return __AttributeProxy(attributeType: __Attribute_UserPreferences_theme.self)
+                    }
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "settings_")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
+
+                extension UserPreferences: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -799,85 +667,74 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct GameSettings {
-                        var playerName: String {
-                            get {
-                                return __Attribute_GameSettings_playerName.read()
-                            }
-                            set {
-                                __Attribute_GameSettings_playerName.write(value: newValue)
-                            }
+                struct GameSettings {
+                    var playerName: String {
+                        get {
+                            return __Attribute_GameSettings_playerName.read()
                         }
-
-                        public enum __Attribute_GameSettings_playerName: __AttributeNonOptional {
-                            public typealias Container = GameSettings
-                            public typealias Value = String
-                            public static let name = "playerName"
-                            public static let defaultValue: String = "Player1"
-                            public static let defaultRegistrar = __DefaultRegistrar()
-                        }
-
-                        public var $playerName: __AttributeProxy<__Attribute_GameSettings_playerName> {
-                            return __AttributeProxy(attributeType: __Attribute_GameSettings_playerName.self)
-                        }
-                        var highScore: Int {
-                            get {
-                                return __Attribute_GameSettings_highScore.read()
-                            }
-                            set {
-                                __Attribute_GameSettings_highScore.write(value: newValue)
-                            }
-                        }
-
-                        public enum __Attribute_GameSettings_highScore: __AttributeNonOptional {
-                            public typealias Container = GameSettings
-                            public typealias Value = Int
-                            public static let name = "highScore"
-                            public static let defaultValue: Int = 0
-                            public static let defaultRegistrar = __DefaultRegistrar()
-                        }
-
-                        public var $highScore: __AttributeProxy<__Attribute_GameSettings_highScore> {
-                            return __AttributeProxy(attributeType: __Attribute_GameSettings_highScore.self)
-                        }
-
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = "game_"
-                        }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            __Attribute_GameSettings_playerName.write(value: newValue)
                         }
                     }
 
-                    extension GameSettings: __Settings_Container {
+                    public enum __Attribute_GameSettings_playerName: __AttributeNonOptional {
+                        public typealias Container = GameSettings
+                        public typealias Value = String
+                        public static let name = "playerName"
+                        public static let defaultValue: String = "Player1"
+                        public static let defaultRegistrar = __DefaultRegistrar()
                     }
-                    """,
+
+                    public var $playerName: __AttributeProxy<__Attribute_GameSettings_playerName> {
+                        return __AttributeProxy(attributeType: __Attribute_GameSettings_playerName.self)
+                    }
+                    var highScore: Int {
+                        get {
+                            return __Attribute_GameSettings_highScore.read()
+                        }
+                        set {
+                            __Attribute_GameSettings_highScore.write(value: newValue)
+                        }
+                    }
+
+                    public enum __Attribute_GameSettings_highScore: __AttributeNonOptional {
+                        public typealias Container = GameSettings
+                        public typealias Value = Int
+                        public static let name = "highScore"
+                        public static let defaultValue: Int = 0
+                        public static let defaultRegistrar = __DefaultRegistrar()
+                    }
+
+                    public var $highScore: __AttributeProxy<__Attribute_GameSettings_highScore> {
+                        return __AttributeProxy(attributeType: __Attribute_GameSettings_highScore.self)
+                    }
+
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "game_")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
+                        }
+                        set {
+                            state.store = newValue
+                        }
+                    }
+
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
+                    }
+                }
+
+                extension GameSettings: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else
@@ -899,46 +756,35 @@ final class UserDefaultsContainerMacroExpansionTests: XCTestCase {
                 }
                 """,
                 expandedSource: """
-                    struct ExistingContainer: __Settings_Container {
-                        static let someProperty = "value"
+                struct ExistingContainer: __Settings_Container {
+                    static let someProperty = "value"
 
-                        struct Config {
-                            var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                            var prefix: String = "existing_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "existing_")
+                    }
+
+                    public internal(set) static var store: any UserDefaultsStore {
+                        get {
+                            state.store
                         }
-
-                        private static let _config = OSAllocatedUnfairLock(initialState: Config())
-
-                        public internal(set) static var store: any UserDefaultsStore {
-                            get {
-                                _config.withLock { config in
-                                    config.store
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.store = newValue
-                                }
-                            }
-                        }
-
-                        public static var prefix: String {
-                            get {
-                                _config.withLock { config in
-                                    config.prefix
-                                }
-                            }
-                            set {
-                                _config.withLock { config in
-                                    config.prefix = newValue.replacing(".", with: "_")
-                                }
-                            }
+                        set {
+                            state.store = newValue
                         }
                     }
 
-                    extension ExistingContainer: __Settings_Container {
+                    public internal(set) static var prefix: String {
+                        get {
+                            state.prefix
+                        }
+                        set {
+                            state.prefix = newValue
+                        }
                     }
-                    """,
+                }
+
+                extension ExistingContainer: __Settings_Container {
+                }
+                """,
                 macros: testMacros
             )
         #else

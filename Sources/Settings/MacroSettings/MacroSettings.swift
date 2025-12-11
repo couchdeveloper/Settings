@@ -61,7 +61,7 @@
 @attached(
     member,
     names: named(Config),
-    named(_config),
+    named(state),
     named(store),
     named(prefix)
 )

@@ -3,9 +3,9 @@ import Foundation
 import Observation
 import Settings
 import SettingsMock
-// MARK: - App
-import SwiftUI
 import os
+
+// MARK: - App
 
 // protocol ConstString {
 //     static var value: String { get }
@@ -49,7 +49,7 @@ import os
 // print("Hello UserDefaults!")
 // try test()
 
-@Settings struct Settings1 {
+@Settings() struct Settings1 {
     @Setting var setting: String = "default"
 }
 
@@ -57,7 +57,7 @@ import os
     @Setting var setting: String = "default"
 }
 
-@Settings struct AppSettings {}
+@Settings() struct AppSettings {}
 extension AppSettings {
     enum UserSettings {
         @Setting var setting: String = "default"
@@ -146,6 +146,10 @@ extension AppSettingValues {
     @Setting var theme: String = "default"
 }
 
+#if true
+
+import SwiftUI
+
 // @main
 struct SettingsView: View {
     @Environment(\.userDefaultsStore) var settings
@@ -169,3 +173,4 @@ struct ProductionApp: App {
 //     SettingsView()
 //         .environment(\.userDefaultsStore, UserDefaultsStoreMock(store: ["user": "John"]))
 // }
+#endif

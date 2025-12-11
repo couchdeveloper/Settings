@@ -1,6 +1,7 @@
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
 import XCTest
+import SwiftParser
 
 @testable import SettingsMacros
 
@@ -59,36 +60,25 @@ final class SettingMacroExpansionTests: XCTestCase {
                         return __AttributeProxy(attributeType: __Attribute_AppSettings_setting.self)
                     }
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -140,36 +130,25 @@ final class SettingMacroExpansionTests: XCTestCase {
                         return __AttributeProxy(attributeType: __Attribute_AppSettings_setting.self)
                     }
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = "app_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -203,36 +182,25 @@ final class SettingMacroExpansionTests: XCTestCase {
             let expected = """
                 struct AppSettings {
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -289,36 +257,25 @@ final class SettingMacroExpansionTests: XCTestCase {
             let expected = """
                 struct AppSettings {
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = "app_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -377,36 +334,25 @@ final class SettingMacroExpansionTests: XCTestCase {
             let expected = """
                 struct AppSettings {
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -468,36 +414,25 @@ final class SettingMacroExpansionTests: XCTestCase {
             let expected = """
                 struct AppSettings {
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = "app_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -557,36 +492,25 @@ final class SettingMacroExpansionTests: XCTestCase {
             let expected = """
                 struct AppSettings { enum Profile {} 
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -643,36 +567,25 @@ final class SettingMacroExpansionTests: XCTestCase {
             let expected = """
                 struct AppSettings { enum Profile {} 
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = "app_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -729,36 +642,25 @@ final class SettingMacroExpansionTests: XCTestCase {
             let expected = """
                 struct AppSettings {
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -816,36 +718,25 @@ final class SettingMacroExpansionTests: XCTestCase {
             let expected = """
                 struct AppSettings {
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = "app_"
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "app_")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -889,6 +780,7 @@ final class SettingMacroExpansionTests: XCTestCase {
             )
         #endif
     }
+    
     func testAllPropertyListTypes() throws {
         #if canImport(SettingsMacros)
             let allCases: [Case] = [
@@ -1014,36 +906,25 @@ final class SettingMacroExpansionTests: XCTestCase {
             let expected = """
                 struct AppSettings {
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -1101,36 +982,25 @@ final class SettingMacroExpansionTests: XCTestCase {
             let expected = """
                 struct AppSettings {
 
-                    struct Config {
-                        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                        var prefix: String = ""
+                    private static var state: __Settings_Container_Config {
+                        __Settings_Container_Config(prefix: "")
                     }
-
-                    private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                     public internal(set) static var store: any UserDefaultsStore {
                         get {
-                            _config.withLock { config in
-                                config.store
-                            }
+                            state.store
                         }
                         set {
-                            _config.withLock { config in
-                                config.store = newValue
-                            }
+                            state.store = newValue
                         }
                     }
 
-                    public static var prefix: String {
+                    public internal(set) static var prefix: String {
                         get {
-                            _config.withLock { config in
-                                config.prefix
-                            }
+                            state.prefix
                         }
                         set {
-                            _config.withLock { config in
-                                config.prefix = newValue.replacing(".", with: "_")
-                            }
+                            state.prefix = newValue
                         }
                     }
                 }
@@ -1398,36 +1268,25 @@ extension SettingMacroExpansionTests {
         configInfrastructure = """
 
 
-                struct Config {
-                    var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                    var prefix: String = "\(prefixValue)"
+                private static var state: __Settings_Container_Config {
+                    __Settings_Container_Config(prefix: "\(prefixValue)")
                 }
-
-                private static let _config = OSAllocatedUnfairLock(initialState: Config())
 
                 public internal(set) static var store: any UserDefaultsStore {
                     get {
-                        _config.withLock { config in
-                            config.store
-                        }
+                        state.store
                     }
                     set {
-                        _config.withLock { config in
-                            config.store = newValue
-                        }
+                        state.store = newValue
                     }
                 }
 
-                public static var prefix: String {
+                public internal(set) static var prefix: String {
                     get {
-                        _config.withLock { config in
-                            config.prefix
-                        }
+                        state.prefix
                     }
                     set {
-                        _config.withLock { config in
-                            config.prefix = newValue.replacing(".", with: "_")
-                        }
+                        state.prefix = newValue
                     }
                 }
             """

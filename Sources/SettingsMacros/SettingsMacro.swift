@@ -26,43 +26,25 @@ extension SettingsMacro: MemberMacro {
         }
         let literalPrefix = initialPrefix == nil ? "" : initialPrefix!
 
-        let declSyntax = DeclSyntax(
-            """
-            struct Config {
-                var store: any UserDefaultsStore = Foundation.UserDefaults.standard
-                var prefix: String = "\(raw: literalPrefix)"
-            }
+        let stateDecl: DeclSyntax = """
+        private static var state: __Settings_Container_Config { __Settings_Container_Config(prefix: "\(raw: literalPrefix)") }
+        """
 
-            private static let _config = OSAllocatedUnfairLock(initialState: Config())
+        let storeDecl: DeclSyntax = """
+        public internal(set) static var store: any UserDefaultsStore {
+            get { state.store }
+            set { state.store = newValue }
+        }
+        """
 
-            public internal(set) static var store: any UserDefaultsStore {
-                get {
-                    _config.withLock { config in
-                        config.store
-                    }
-                }
-                set {
-                    _config.withLock { config in
-                        config.store = newValue
-                    }
-                }
-            }
+        let prefixDecl: DeclSyntax = """
+        public internal(set) static var prefix: String {
+            get { state.prefix }
+            set { state.prefix = newValue }
+        }
+        """
 
-            public static var prefix: String {
-                get {
-                    _config.withLock { config in
-                        config.prefix
-                    }
-                }
-                set {
-                    _config.withLock { config in
-                        config.prefix = newValue.replacing(".", with: "_")
-                    }
-                }
-            }
-            """
-        )
-        return [declSyntax]
+        return [stateDecl, storeDecl, prefixDecl]
     }
 }
 

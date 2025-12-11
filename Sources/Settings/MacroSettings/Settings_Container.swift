@@ -161,3 +161,41 @@ extension __Settings_Container {
         self.store.observer(forKey: key, update: update)
     }
 }
+
+public struct __Settings_Container_Config: Sendable {
+    struct State {
+        var store: any UserDefaultsStore = Foundation.UserDefaults.standard
+        var prefix: String
+    }
+    private let _state: OSAllocatedUnfairLock<State>
+    
+    public init(prefix: String) {
+        _state = .init(initialState: .init(prefix: prefix))
+    }
+    
+    public var store: any UserDefaultsStore {
+        get {
+            _state.withLock { state in
+                state.store
+            }
+        }
+        nonmutating set {
+            _state.withLock { state in
+                state.store = newValue
+            }
+        }
+    }
+
+    public var prefix: String {
+        get {
+            _state.withLock { state in
+                state.prefix
+            }
+        }
+        nonmutating set {
+            _state.withLock { state in
+                state.prefix = newValue.replacing(".", with: "_")
+            }
+        }
+    }
+}
