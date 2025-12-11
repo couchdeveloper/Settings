@@ -48,7 +48,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = Bool
                         public static let name = "setting"
                         public static let defaultValue: Bool = true
@@ -118,7 +118,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = Bool
                         public static let name = "setting"
                         public static let defaultValue: Bool = true
@@ -215,7 +215,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = Bool
                         public static let name = "setting"
                         public static let defaultValue: Bool = true
@@ -290,7 +290,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = Bool
                         public static let name = "setting"
                         public static let defaultValue: Bool = true
@@ -370,7 +370,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = Bool
                         public static let name = "Profile::setting"
                         public static let defaultValue: Bool = true
@@ -450,7 +450,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = Bool
                         public static let name = "Profile::setting"
                         public static let defaultValue: Bool = true
@@ -525,7 +525,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = Bool
                         public static let name = "Profile::setting"
                         public static let defaultValue: Bool = true
@@ -600,7 +600,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = Bool
                         public static let name = "Profile::setting"
                         public static let defaultValue: Bool = true
@@ -675,7 +675,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = Bool
                         public static let name = "Profile::setting"
                         public static let defaultValue: Bool = true
@@ -751,7 +751,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_Profile_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = Bool
                         public static let name = "Profile::setting"
                         public static let defaultValue: Bool = true
@@ -941,7 +941,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_UserSettings_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = String
                         public static let name = "UserSettings::setting"
                         public static let defaultValue: String = "default"
@@ -1014,7 +1014,7 @@ final class SettingsSettingMacroExpansionTests: XCTestCase {
                     }
 
                     public enum __Attribute_AppSettings_UserSettings_setting: __AttributeNonOptional {
-                        public typealias Container = AppSettings
+                        public typealias Container = __ContainerResolver<AppSettings>
                         public typealias Value = String
                         public static let name = "UserSettings::setting"
                         public static let defaultValue: String = "default"

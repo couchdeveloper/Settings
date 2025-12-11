@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 public protocol __Attribute<Container>: SendableMetatype {
-    associatedtype Container // : __Settings_Container
+    associatedtype Container: __Settings_Container
     associatedtype Value
 
     static var name: String { get }
@@ -36,6 +36,35 @@ extension __Attribute where Container: __Settings_Container{
 }
 
 public protocol PropertyListValue {}
+
+// MARK: - Container Resolver
+
+// A type-erasing wrapper that conditionally conforms to `__Settings_Container`.
+//
+// When `Base` conforms to `__Settings_Container`, this wrapper forwards to the base.
+// Otherwise, it provides default behavior using `UserDefaults.standard` with no prefix.
+public struct __ContainerResolver<Base> {
+    private init() {} // Never instantiated
+}
+
+extension __ContainerResolver: __Settings_Container {
+    public static var store: any UserDefaultsStore {
+        UserDefaults.standard
+    }
+    
+    public static var prefix: String { "" }
+}
+
+extension __ContainerResolver where Base: __Settings_Container {
+    public static var store: any UserDefaultsStore {
+        Base.store
+    }
+    
+    public static var prefix: String {
+        Base.prefix
+    }
+}
+
 
 // MARK: - Internal
 

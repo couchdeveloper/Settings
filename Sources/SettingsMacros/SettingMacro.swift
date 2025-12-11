@@ -271,18 +271,21 @@ extension SettingMacro {
         )
     }
 
-    /// Creates the `typealias Container = <ContainerType>` member for the attribute enum.
+    /// Creates the `typealias Container = __ContainerResolver<BaseType>` member for the attribute enum.
+    /// This uses conditional conformance to select either the base container (if it conforms to __Settings_Container)
+    /// or provides a default implementation with UserDefaults.standard.
     private static func makeContainerTypealias(containerType: String)
         -> MemberBlockItemSyntax
     {
-        MemberBlockItemSyntax(
+        // Generate: typealias Container = __ContainerResolver<BaseType>
+        let containerResolverType = "__ContainerResolver<\(containerType)>"
+        
+        return MemberBlockItemSyntax(
             decl: TypeAliasDeclSyntax(
                 modifiers: [DeclModifierSyntax(name: .keyword(.public))],
                 name: "Container",
                 initializer: TypeInitializerClauseSyntax(
-                    value: IdentifierTypeSyntax(
-                        name: .identifier(containerType)
-                    )
+                    value: TypeSyntax(stringLiteral: containerResolverType)
                 )
             )
         )
@@ -857,8 +860,11 @@ extension SettingMacro {
         // Walk up the container type hierarchy and find the first type
         // which is a store Container (aka `__Settings_Container`)
         var topContainer: String = ""
+        var inExtension = false
+        
         for contextNode in context.lexicalContext {
             if let extensionDecl = contextNode.as(ExtensionDeclSyntax.self) {
+                inExtension = true
                 let fullTypeName = extensionDecl.extendedType.description
                     .trimmingCharacters(in: .whitespacesAndNewlines)
                 topContainer =
@@ -871,38 +877,47 @@ extension SettingMacro {
                 }
             }
             if let structDecl = contextNode.as(StructDeclSyntax.self) {
-                topContainer = structDecl.name.text
+                if topContainer.isEmpty {
+                    topContainer = structDecl.name.text
+                }
                 if isAnnotatedWithUserDefaultsMacro(structDecl.attributes) {
-                    return topContainer
+                    return structDecl.name.text
                 }
             }
             if let classDecl = contextNode.as(ClassDeclSyntax.self) {
-                topContainer = classDecl.name.text
+                if topContainer.isEmpty {
+                    topContainer = classDecl.name.text
+                }
                 if isAnnotatedWithUserDefaultsMacro(classDecl.attributes) {
-                    return topContainer
+                    return classDecl.name.text
                 }
             }
             if let enumDecl = contextNode.as(EnumDeclSyntax.self) {
-                topContainer = enumDecl.name.text
+                if topContainer.isEmpty {
+                    topContainer = enumDecl.name.text
+                }
                 if isAnnotatedWithUserDefaultsMacro(enumDecl.attributes) {
-                    return topContainer
+                    return enumDecl.name.text
                 }
             }
             if let actorDecl = contextNode.as(ActorDeclSyntax.self) {
-                topContainer = actorDecl.name.text
+                if topContainer.isEmpty {
+                    topContainer = actorDecl.name.text
+                }
                 if isAnnotatedWithUserDefaultsMacro(actorDecl.attributes) {
-                    return topContainer
+                    return actorDecl.name.text
                 }
             }
         }
 
-        // If no Container found, use the root container, and make the
-        // assumption it is_a `__Settings_Container`. If it is not,
-        // the compiler will emit an error.
-        guard !topContainer.isEmpty else {
-            throw MacroError.noContainerFound
+        // If we're in an extension or found a top container name, return it
+        // The type system will resolve whether it's a __Settings_Container via __ContainerResolver
+        if !topContainer.isEmpty {
+            return topContainer
         }
-        return topContainer
+
+        // No container found at all - this shouldn't happen in valid Swift code
+        throw MacroError.noContainerFound
     }
 
     /// Returns the containers attributes.
@@ -1189,6 +1204,18 @@ extension SettingMacro {
                     separator: "::"
                 )
                 return "\(namespace)::\(propertyName)"
+            }
+        } else {
+            // No extension, check if we have nested types (e.g., enum inside enum)
+            if !nestedTypeNames.isEmpty {
+                // Reverse because we collected from innermost to outermost
+                // Skip the outermost container (the one that would have @Settings)
+                let namespace = nestedTypeNames.dropLast().reversed().joined(
+                    separator: "::"
+                )
+                if !namespace.isEmpty {
+                    return "\(namespace)::\(propertyName)"
+                }
             }
         }
 
